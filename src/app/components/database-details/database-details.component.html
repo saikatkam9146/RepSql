@@ -1,0 +1,16 @@
+<div class="database-details-container">
+  <h2>Database Details</h2>
+  <table>
+    <tr><th>Connection ID</th><td>{{ database.fnConnectionID }}</td></tr>
+    <tr><th>Connection Name</th><td>{{ database.fcConnectionName }}</td></tr>
+    <tr><th>Type</th><td>{{ database.fcConnectionType }}</td></tr>
+    <tr><th>Provider</th><td>{{ database.fcProvider }}</td></tr>
+    <tr><th>Data Source</th><td>{{ database.fcDataSource }}</td></tr>
+    <tr><th>Initial Catalog</th><td>{{ database.fcInitialCatalog }}</td></tr>
+    <tr><th>Integrated Security</th><td>{{ database.fcIntegratedSecurity }}</td></tr>
+    <tr><th>Trusted Connection</th><td>{{ database.fcTrustedConnection }}</td></tr>
+    <tr><th>Active</th><td>{{ database.fnDatabaseActive ? 'Yes' : 'No' }}</td></tr>
+    <tr><th>Last Update</th><td>{{ database.fdLastUpdate }}</td></tr>
+    <tr><th>Schema</th><td>{{ database.fcSchema }}</td></tr>
+  </table>
+</div>

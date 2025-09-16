@@ -1,0 +1,39 @@
+
+<div class="users-container">
+  <div class="users-header">
+    <h2>Users</h2>
+    <button class="add-btn" (click)="openAddUser()" title="Add New User">
+      <span class="plus-icon">&#43;</span>
+    </button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Email</th>
+        <th>Department</th>
+        <th>Access</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users; let i = index">
+        <td>{{ user.User.fcFirstName }}</td>
+        <td>{{ user.User.fcLastName }}</td>
+        <td>{{ user.User.fcUserEmail }}</td>
+        <td>{{ user.Department.fcDepartmentName }}</td>
+        <td>{{ user.UserAccess.fcAccessDescription }}</td>
+        <td>{{ user.User.fcApprovalStatus }}</td>
+        <td>
+          <button (click)="navigateToUserDetails(user, i)">Details</button>
+          <button (click)="navigateToEditUser(user, i)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+</div>

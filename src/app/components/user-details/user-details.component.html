@@ -1,0 +1,17 @@
+<div class="user-details-container">
+  <h2>User Details</h2>
+  <table>
+    <tr><th>User ID</th><td>{{ user.fnUserID }}</td></tr>
+    <tr><th>First Name</th><td>{{ user.fcFirstName }}</td></tr>
+    <tr><th>Last Name</th><td>{{ user.fcLastName }}</td></tr>
+    <tr><th>User NT</th><td>{{ user.fcUserNT }}</td></tr>
+    <tr><th>Email</th><td>{{ user.fcUserEmail }}</td></tr>
+    <tr><th>Department</th><td>{{ user.Department?.fcDepartmentName }}</td></tr>
+    <tr><th>Access</th><td>{{ user.UserAccess?.fcAccessDescription }}</td></tr>
+    <tr><th>Status</th><td>{{ user.fcApprovalStatus }}</td></tr>
+    <tr><th>Comments</th><td>{{ user.fcComments }}</td></tr>
+    <tr><th>Run Console Permission</th><td>{{ user.fnRunConsolePermission ? 'Yes' : 'No' }}</td></tr>
+    <tr><th>Developer</th><td>{{ user.fbDeveloper ? 'Yes' : 'No' }}</td></tr>
+    <tr><th>TimeZone</th><td>{{ user.TimeZoneOffset?.TimeZoneName }}</td></tr>
+  </table>
+</div>

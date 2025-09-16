@@ -1,0 +1,40 @@
+<div class="edit-user-container">
+  <h2>Edit User</h2>
+  <!-- Form fields for editing user go here -->
+  <form #editUserForm="ngForm" (ngSubmit)="saveUser(editUserForm)">
+    <div class="form-grid">
+      <div>
+        <label>User ID:</label>
+        <input type="number" [(ngModel)]="user.fnUserID" name="fnUserID" readonly />
+        <label>First Name:</label>
+        <input type="text" [(ngModel)]="user.fcFirstName" name="fcFirstName" />
+        <label>User NT:</label>
+        <input type="text" [(ngModel)]="user.fcUserNT" name="fcUserNT" />
+        <label>Department:</label>
+        <input type="text" [(ngModel)]="user.Department.fcDepartmentName" name="fcDepartmentName" />
+        <label>Status:</label>
+        <input type="text" [(ngModel)]="user.fcApprovalStatus" name="fcApprovalStatus" />
+        <label>Run Console Permission:</label>
+        <input type="checkbox" [(ngModel)]="user.fnRunConsolePermission" name="fnRunConsolePermission" />
+        <label>TimeZone:</label>
+        <input type="text" [(ngModel)]="user.TimeZoneOffset.TimeZoneName" name="TimeZoneName" />
+      </div>
+      <div>
+        <label>Last Name:</label>
+        <input type="text" [(ngModel)]="user.fcLastName" name="fcLastName" />
+        <label>Email:</label>
+        <input type="email" [(ngModel)]="user.fcUserEmail" name="fcUserEmail" />
+        <label>Access:</label>
+        <input type="text" [(ngModel)]="user.UserAccess.fcAccessDescription" name="fcAccessDescription" />
+        <label>Comments:</label>
+        <input type="text" [(ngModel)]="user.fcComments" name="fcComments" />
+        <label>Developer:</label>
+        <input type="checkbox" [(ngModel)]="user.fbDeveloper" name="fbDeveloper" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Save</button>
+      <button type="button" (click)="cancel()">Cancel</button>
+    </div>
+  </form>
+</div>

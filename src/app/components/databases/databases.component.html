@@ -1,0 +1,38 @@
+<div class="databases-container">
+  <div class="databases-header">
+    <h2>Databases</h2>
+    <button class="add-btn" (click)="openAddDatabase()" title="Add New Database">
+      <span class="plus-icon">&#43;</span>
+    </button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Provider</th>
+        <th>Data Source</th>
+        <th>Active</th>
+        <th>Last Update</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let db of databases; let i = index">
+        <td>{{ db.fcConnectionName }}</td>
+        <td>{{ db.fcConnectionType }}</td>
+        <td>{{ db.fcProvider }}</td>
+        <td>{{ db.fcDataSource }}</td>
+        <td>{{ db.fnDatabaseActive ? 'Yes' : 'No' }}</td>
+        <td>{{ db.fdLastUpdate | date:'short' }}</td>
+        <td>
+          <button (click)="navigateToDatabaseDetails(db, i)">Details</button>
+          <button (click)="navigateToEditDatabase(db, i)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+</div>
