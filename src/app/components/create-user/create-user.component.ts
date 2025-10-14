@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { NavbarComponent } from '../navbar.component';
+import { RouterModule, Router } from '@angular/router';
+// ...existing code...
+import { UsersService } from '../../services/users.service';
+import { UserItem } from '../../models/user.model';
 
 @Component({
   selector: 'app-create-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss']
 })
@@ -27,18 +29,29 @@ export class CreateUserComponent {
     TimeZoneID: null
   };
 
-  static users: any[] = [];
+  constructor(private usersService: UsersService, private router: Router) {}
 
   saveUser() {
-    // Simulate API call by adding to static users array
-    const nextId = CreateUserComponent.users.length > 0 ? Math.max(...CreateUserComponent.users.map((u: any) => u.User.fnUserID)) + 1 : 1;
-    this.newUser.fnUserID = nextId;
-    CreateUserComponent.users.push({
-      User: { ...this.newUser },
-      Department: { fnDepartmentID: this.newUser.fnDepartmentID, fcDepartmentName: '' },
-      UserAccess: { fnAccessID: this.newUser.fnAccessID, fcAccessDescription: '' },
-      TimeZoneOffset: { TimeZoneID: this.newUser.TimeZoneID, TimeZoneCode: '', TimeZoneName: '', std_Offset: 0, daylight_Offset: 0 }
+    const payload: UserItem = {
+      fnUserID: 0,
+      fcFirstName: this.newUser.fcFirstName,
+      fcLastName: this.newUser.fcLastName,
+      fcUserNT: this.newUser.fcUserNT,
+      fcUserEmail: this.newUser.fcUserEmail,
+      fnDepartmentID: this.newUser.fnDepartmentID,
+      fnAccessID: this.newUser.fnAccessID,
+      fcApprovalStatus: this.newUser.fcApprovalStatus,
+      fcComments: this.newUser.fcComments,
+      fnRunConsolePermission: this.newUser.fnRunConsolePermission,
+      fbDeveloper: this.newUser.fbDeveloper,
+      TimeZoneID: this.newUser.TimeZoneID
+    };
+
+    this.usersService.createUser(payload).subscribe({
+      next: () => this.router.navigate(['/users']),
+      error: (err) => { console.error(err); alert('Failed to create user'); }
     });
-    alert('User created and added!');
   }
+
+  cancel() { this.router.navigate(['/users']); }
 }

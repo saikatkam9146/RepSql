@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { NavbarComponent } from '../navbar.component';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { UsersService } from '../../services/users.service';
+import { UserItem, UserRecord } from '../../models/user.model';
 
 @Component({
   selector: 'app-edit-user',
@@ -13,43 +14,25 @@ import { NavbarComponent } from '../navbar.component';
 })
 export class EditUserComponent {
   userId: number | null = null;
-  user: any = null;
+  userWrapper: UserRecord | null = null;
 
-  constructor() {
-    // Simulate ActivatedRoute for demo; replace with ActivatedRoute in real app
-    this.userId = 1;
-    this.user = {
-      fnUserID: this.userId,
-      fcFirstName: 'John',
-      fcLastName: 'Doe',
-      fcUserNT: 'jdoe',
-      fcUserEmail: 'john.doe@example.com',
-      fnDepartmentID: 1,
-      fnAccessID: 1,
-      fcApprovalStatus: 'Approved',
-      fcComments: '',
-      fnRunConsolePermission: true,
-      fbDeveloper: false,
-      TimeZoneID: 1,
-      Department: { fnDepartmentID: 1, fcDepartmentName: 'IT' },
-      UserAccess: { fnAccessID: 1, fcAccessDescription: 'Admin' },
-      TimeZoneOffset: { TimeZoneID: 1, TimeZoneCode: 'EST', TimeZoneName: 'Eastern', std_Offset: -5, daylight_Offset: -4 }
-    };
-  }
-
-  saveUser() {
-    // Simulate API update by finding and updating user in static users array
-    const idx = (window as any).CreateUserComponent?.users?.findIndex((u: any) => u.User.fnUserID === this.user.fnUserID);
-    if (idx !== undefined && idx !== -1) {
-      (window as any).CreateUserComponent.users[idx].User = { ...this.user };
-      alert('User updated!');
-    } else {
-      alert('User not found!');
+  constructor(private route: ActivatedRoute, private usersService: UsersService, private router: Router) {
+    const idStr = this.route.snapshot.paramMap.get('id');
+    this.userId = idStr ? Number(idStr) : null;
+    if (this.userId) {
+      this.usersService.getUser(this.userId).subscribe(res => {
+        if (res) this.userWrapper = res;
+      });
     }
   }
 
-  cancel() {
-    // TODO: Replace with navigation logic
-    alert('Cancelled.');
+  saveUser() {
+    if (!this.userId || !this.userWrapper) return;
+    this.usersService.updateUser(this.userId, this.userWrapper.User).subscribe({
+      next: () => this.router.navigate(['/users']),
+      error: (err) => { console.error(err); alert('Failed to update user'); }
+    });
   }
+
+  cancel() { this.router.navigate(['/users']); }
 }

@@ -7,12 +7,14 @@ Follow these steps to upload your ReportingSchedulerWeb project to GitHub. This 
 ## 1. Create a GitHub Account
 - Go to https://github.com
 - Sign up or log in
+- **Explanation:** You need a GitHub account to create repositories and store your code online.
 
 ## 2. Create a New Repository
 - Click the "+" icon (top right) → "New repository"
 - Name your repo (e.g., `ReportingSchedulerWeb`)
 - Choose public or private
 - Click "Create repository"
+- **Explanation:** This creates a space on GitHub to store your project. The repo name should match your project or be descriptive.
 
 ## 3. Initialize Git Locally
 - Open your terminal in `D:\Angular\ReportingSchedulerWeb`
@@ -22,6 +24,10 @@ Follow these steps to upload your ReportingSchedulerWeb project to GitHub. This 
   git add .
   git commit -m "Initial commit"
   ```
+- **Explanation:**
+  - `git init` starts a new local git repository in your project folder.
+  - `git add .` stages all files for commit.
+  - `git commit -m "Initial commit"` saves your project snapshot with a message.
 
 ## 4. Connect Local Repo to GitHub
 - Copy your repo URL from GitHub (e.g., `https://github.com/your-username/ReportingSchedulerWeb.git`)
@@ -31,10 +37,16 @@ Follow these steps to upload your ReportingSchedulerWeb project to GitHub. This 
   git branch -M main
   git push -u origin main
   ```
+- **Explanation:**
+  - The repo URL is found on your GitHub repo page (click the green "Code" button and copy the HTTPS link).
+  - `git remote add origin ...` links your local repo to the GitHub repo.
+  - `git branch -M main` sets your branch name to `main` (standard for new repos).
+  - `git push -u origin main` uploads your code to GitHub.
 
 ## 5. Done!
 - Your project is now on GitHub.
 - You can share the repo or invite collaborators.
+- **Explanation:** Your code is now safely stored online and can be accessed from anywhere.
 
 ---
 
@@ -47,12 +59,14 @@ Follow these steps to upload your ReportingSchedulerWeb project to GitHub. This 
   .env
   *.log
   ```
+- **Explanation:** `.gitignore` tells git to skip files/folders you don't want to upload (like dependencies and build outputs).
 
 ---
 
 ## Need More Help?
 - Ask for a README.md or more setup help if needed!
 - Explore GitHub Docs: https://docs.github.com/en
+- **Explanation:** GitHub Docs have detailed guides for beginners and advanced users.
 
 ---
 

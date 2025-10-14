@@ -2,38 +2,38 @@
 
 <div class="create-user-container">
   <h2>Create User</h2>
-  <form>
+  <form (ngSubmit)="saveUser()">
     <div class="form-grid">
       <div>
         <label>First Name:</label>
-        <input type="text" />
+        <input type="text" [(ngModel)]="newUser.fcFirstName" name="fcFirstName" />
         <label>User NT:</label>
-        <input type="text" />
+        <input type="text" [(ngModel)]="newUser.fcUserNT" name="fcUserNT" />
         <label>Department ID:</label>
-        <input type="number" />
+        <input type="number" [(ngModel)]="newUser.fnDepartmentID" name="fnDepartmentID" />
         <label>Status:</label>
-        <input type="text" />
+        <input type="text" [(ngModel)]="newUser.fcApprovalStatus" name="fcApprovalStatus" />
         <label>Run Console Permission:</label>
-        <input type="checkbox" />
+        <input type="checkbox" [(ngModel)]="newUser.fnRunConsolePermission" name="fnRunConsolePermission" />
         <label>TimeZone ID:</label>
-        <input type="number" />
+        <input type="number" [(ngModel)]="newUser.TimeZoneID" name="TimeZoneID" />
       </div>
       <div>
         <label>Last Name:</label>
-        <input type="text" />
+        <input type="text" [(ngModel)]="newUser.fcLastName" name="fcLastName" />
         <label>Email:</label>
-        <input type="email" />
+        <input type="email" [(ngModel)]="newUser.fcUserEmail" name="fcUserEmail" />
         <label>Access ID:</label>
-        <input type="number" />
+        <input type="number" [(ngModel)]="newUser.fnAccessID" name="fnAccessID" />
         <label>Comments:</label>
-        <input type="text" />
+        <input type="text" [(ngModel)]="newUser.fcComments" name="fcComments" />
         <label>Developer:</label>
-        <input type="checkbox" />
+        <input type="checkbox" [(ngModel)]="newUser.fbDeveloper" name="fbDeveloper" />
       </div>
     </div>
     <div class="form-actions">
       <button type="submit">Save</button>
-      <button type="button">Cancel</button>
+  <button type="button" (click)="cancel()">Cancel</button>
     </div>
   </form>
 </div>

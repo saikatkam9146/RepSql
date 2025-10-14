@@ -1,35 +1,35 @@
 <div class="edit-user-container">
   <h2>Edit User</h2>
   <!-- Form fields for editing user go here -->
-  <form #editUserForm="ngForm" (ngSubmit)="saveUser(editUserForm)">
+  <form *ngIf="userWrapper" #editUserForm="ngForm" (ngSubmit)="saveUser()">
     <div class="form-grid">
       <div>
-        <label>User ID:</label>
-        <input type="number" [(ngModel)]="user.fnUserID" name="fnUserID" readonly />
+  <label>User ID:</label>
+        <input type="number" [(ngModel)]="userWrapper.User.fnUserID" name="fnUserID" readonly />
         <label>First Name:</label>
-        <input type="text" [(ngModel)]="user.fcFirstName" name="fcFirstName" />
-        <label>User NT:</label>
-        <input type="text" [(ngModel)]="user.fcUserNT" name="fcUserNT" />
+        <input type="text" [(ngModel)]="userWrapper.User.fcFirstName" name="fcFirstName" />
+  <label>User NT:</label>
+        <input type="text" [(ngModel)]="userWrapper.User.fcUserNT" name="fcUserNT" />
         <label>Department:</label>
-        <input type="text" [(ngModel)]="user.Department.fcDepartmentName" name="fcDepartmentName" />
+  <input type="text" [(ngModel)]="userWrapper!.Department!.fcDepartmentName" name="fcDepartmentName" />
         <label>Status:</label>
-        <input type="text" [(ngModel)]="user.fcApprovalStatus" name="fcApprovalStatus" />
+        <input type="text" [(ngModel)]="userWrapper.User.fcApprovalStatus" name="fcApprovalStatus" />
         <label>Run Console Permission:</label>
-        <input type="checkbox" [(ngModel)]="user.fnRunConsolePermission" name="fnRunConsolePermission" />
+        <input type="checkbox" [(ngModel)]="userWrapper.User.fnRunConsolePermission" name="fnRunConsolePermission" />
         <label>TimeZone:</label>
-        <input type="text" [(ngModel)]="user.TimeZoneOffset.TimeZoneName" name="TimeZoneName" />
+  <input type="text" [(ngModel)]="userWrapper!.TimeZoneOffset!.TimeZoneName" name="TimeZoneName" />
       </div>
       <div>
         <label>Last Name:</label>
-        <input type="text" [(ngModel)]="user.fcLastName" name="fcLastName" />
+        <input type="text" [(ngModel)]="userWrapper.User.fcLastName" name="fcLastName" />
         <label>Email:</label>
-        <input type="email" [(ngModel)]="user.fcUserEmail" name="fcUserEmail" />
+        <input type="email" [(ngModel)]="userWrapper.User.fcUserEmail" name="fcUserEmail" />
         <label>Access:</label>
-        <input type="text" [(ngModel)]="user.UserAccess.fcAccessDescription" name="fcAccessDescription" />
+  <input type="text" [(ngModel)]="userWrapper!.UserAccess!.fcAccessDescription" name="fcAccessDescription" />
         <label>Comments:</label>
-        <input type="text" [(ngModel)]="user.fcComments" name="fcComments" />
+        <input type="text" [(ngModel)]="userWrapper.User.fcComments" name="fcComments" />
         <label>Developer:</label>
-        <input type="checkbox" [(ngModel)]="user.fbDeveloper" name="fbDeveloper" />
+        <input type="checkbox" [(ngModel)]="userWrapper.User.fbDeveloper" name="fbDeveloper" />
       </div>
     </div>
     <div class="form-actions">

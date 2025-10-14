@@ -6,6 +6,8 @@
       <span class="plus-icon">&#43;</span>
     </button>
   </div>
+  <div *ngIf="loading">Loading users...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
   <table>
     <thead>
       <tr>
@@ -23,12 +25,13 @@
         <td>{{ user.User.fcFirstName }}</td>
         <td>{{ user.User.fcLastName }}</td>
         <td>{{ user.User.fcUserEmail }}</td>
-        <td>{{ user.Department.fcDepartmentName }}</td>
-        <td>{{ user.UserAccess.fcAccessDescription }}</td>
+  <td>{{ user.Department?.fcDepartmentName }}</td>
+  <td>{{ user.UserAccess?.fcAccessDescription }}</td>
         <td>{{ user.User.fcApprovalStatus }}</td>
         <td>
           <button (click)="navigateToUserDetails(user, i)">Details</button>
           <button (click)="navigateToEditUser(user, i)">Edit</button>
+          <button (click)="deleteUser(user.User.fnUserID)">Delete</button>
         </td>
       </tr>
     </tbody>

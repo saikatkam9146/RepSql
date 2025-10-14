@@ -3,46 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-export interface User {
-  fnUserID: number;
-  fcFirstName: string;
-  fcLastName: string;
-  fcUserNT: string;
-  fcUserEmail: string;
-  fnDepartmentID: number;
-  fnAccessID: number;
-  fcApprovalStatus: string;
-  fcComments: string;
-  fnRunConsolePermission: boolean;
-  fbDeveloper: boolean;
-  TimeZoneID: number;
-}
-
-export interface Department {
-  fnDepartmentID: number;
-  fcDepartmentName: string;
-}
-
-export interface UserAccess {
-  fnAccessID: number;
-  fcAccessDescription: string;
-}
-
-export interface TimeZoneOffset {
-  TimeZoneID: number;
-  TimeZoneCode: string;
-  TimeZoneName: string;
-  std_Offset: number;
-  daylight_Offset: number;
-}
-
-export interface UserRecord {
-  User: User;
-  Department: Department;
-  UserAccess: UserAccess;
-  TimeZoneOffset: TimeZoneOffset;
-}
+import { UsersService } from '../../services/users.service';
+import { UserRecord } from '../../models/user.model';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -54,10 +16,12 @@ export class UsersComponent implements OnInit {
   navigateToUserDetails(user: UserRecord, index: number) {
     this.router.navigate(['/user-details', user.User.fnUserID]);
   }
-  constructor(private router: Router) {}
+  constructor(private router: Router, private usersService: UsersService) {}
   users: UserRecord[] = [];
   selectedUser: UserRecord | null = null;
   showDetailsPopup: boolean = false;
+  loading = false;
+  error: string | null = null;
 
   // Navigation to edit user page (to be implemented)
   navigateToEditUser(user: UserRecord, index: number) {
@@ -65,27 +29,22 @@ export class UsersComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.users = [
-      {
-        User: {
-          fnUserID: 1,
-          fcFirstName: 'John',
-          fcLastName: 'Doe',
-          fcUserNT: 'jdoe',
-          fcUserEmail: 'john.doe@example.com',
-          fnDepartmentID: 1,
-          fnAccessID: 1,
-          fcApprovalStatus: 'Approved',
-          fcComments: '',
-          fnRunConsolePermission: true,
-          fbDeveloper: false,
-          TimeZoneID: 1
-        },
-        Department: { fnDepartmentID: 1, fcDepartmentName: 'IT' },
-        UserAccess: { fnAccessID: 1, fcAccessDescription: 'Admin' },
-        TimeZoneOffset: { TimeZoneID: 1, TimeZoneCode: 'EST', TimeZoneName: 'Eastern', std_Offset: -5, daylight_Offset: -4 }
+    this.loadUsers();
+  }
+
+  loadUsers() {
+    this.loading = true;
+    this.usersService.getUsers().subscribe({
+      next: (res) => {
+        this.users = res;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load users';
+        console.error(err);
+        this.loading = false;
       }
-    ];
+    });
   }
 
   openDetailsPopup(user: UserRecord) {
@@ -101,6 +60,14 @@ export class UsersComponent implements OnInit {
 
   openAddUser() {
     this.router.navigate(['/create-user']);
+  }
+
+  deleteUser(userId: number) {
+    if (!confirm('Delete this user?')) return;
+    this.usersService.deleteUser(userId).subscribe({
+      next: () => this.users = this.users.filter(u => u.User.fnUserID !== userId),
+      error: (err) => console.error(err)
+    });
   }
 
 }
