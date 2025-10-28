@@ -1,0 +1,51 @@
+{
+  "Users": [
+    {
+      "User": {
+        "fnUserID": 100,
+        "fcFirstName": "Sai Pradeep",
+        "fcLastName": "Katkam",
+        "fcUserNT": "NQ87",
+        "fcUserEmail": "katkam.sa@fi.com",
+        "fnDepartmentID": 2,
+        "fnAccessID": 4,
+        "fcApprovalStatus": "Approved",
+        "fcComments": null,
+        "fnRunConsolePermission": false,
+        "fbDeveloper": false,
+        "TimeZoneID": 2
+      },
+      "Department": {
+        "fnDepartmentID": 2,
+        "fcDepartmentName": "Ang"
+      },
+      "UserAccess": {
+        "fnAccessID": 4,
+        "fcAccessDescription": "Administrator Level"
+      },
+      "TimeZoneOffset": {
+        "TimeZoneID": 2,
+        "TimeZoneCode": "EST",
+        "TimeZoneName": "Eastern",
+        "std_Offset": -5,
+        "daylight_Offset": -4
+      },
+      "CurrentUserAccesslevel": null
+    }
+  ],
+  "Departments": [
+    { "fnDepartmentID": 1, "fcDepartmentName": "S" },
+    { "fnDepartmentID": 2, "fcDepartmentName": "A g" },
+    { "fnDepartmentID": 3, "fcDepartmentName": "CC" },
+    { "fnDepartmentID": 4, "fcDepartmentName": "SFR " },
+    { "fnDepartmentID": 5, "fcDepartmentName": " s" },
+    { "fnDepartmentID": 6, "fcDepartmentName": "Tres" },
+    { "fnDepartmentID": 7, "fcDepartmentName": "h g" },
+    { "fnDepartmentID": 8, "fcDepartmentName": "sh s" },
+    { "fnDepartmentID": 9, "fcDepartmentName": "fc" },
+    { "fnDepartmentID": 10, "fcDepartmentName": "HL" },
+    { "fnDepartmentID": 11, "fcDepartmentName": "FF" },
+    { "fnDepartmentID": 12, "fcDepartmentName": " ces" }
+  ],
+  "HasUserEditAccess": true
+}

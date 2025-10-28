@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersService } from '../../services/users.service';
-import { UserRecord } from '../../models/user.model';
+import { UserComplex, UserList } from '../../models/user.model';
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -13,18 +13,18 @@ import { UserRecord } from '../../models/user.model';
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent implements OnInit {
-  navigateToUserDetails(user: UserRecord, index: number) {
+  navigateToUserDetails(user: UserComplex, index: number) {
     this.router.navigate(['/user-details', user.User.fnUserID]);
   }
   constructor(private router: Router, private usersService: UsersService) {}
-  users: UserRecord[] = [];
-  selectedUser: UserRecord | null = null;
+  users: UserComplex[] = [];
+  selectedUser: UserComplex | null = null;
   showDetailsPopup: boolean = false;
   loading = false;
   error: string | null = null;
 
   // Navigation to edit user page (to be implemented)
-  navigateToEditUser(user: UserRecord, index: number) {
+  navigateToEditUser(user: UserComplex, index: number) {
     this.router.navigate(['/edit-user', user.User.fnUserID]);
   }
 
@@ -35,8 +35,9 @@ export class UsersComponent implements OnInit {
   loadUsers() {
     this.loading = true;
     this.usersService.getUsers().subscribe({
-      next: (res) => {
-        this.users = res;
+      next: (res: UserList) => {
+        // API returns a UserList wrapper; use the Users array inside
+        this.users = res?.Users || [];
         this.loading = false;
       },
       error: (err) => {
@@ -47,7 +48,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  openDetailsPopup(user: UserRecord) {
+  openDetailsPopup(user: UserComplex) {
     this.selectedUser = user;
     this.showDetailsPopup = true;
   }
@@ -65,7 +66,7 @@ export class UsersComponent implements OnInit {
   deleteUser(userId: number) {
     if (!confirm('Delete this user?')) return;
     this.usersService.deleteUser(userId).subscribe({
-      next: () => this.users = this.users.filter(u => u.User.fnUserID !== userId),
+      next: () => this.users = this.users.filter((u: UserComplex) => u.User.fnUserID !== userId),
       error: (err) => console.error(err)
     });
   }

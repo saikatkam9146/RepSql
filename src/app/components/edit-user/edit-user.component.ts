@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { UsersService } from '../../services/users.service';
-import { UserItem, UserRecord } from '../../models/user.model';
+import { UserItem, UserRecord, UserEdit, UserComplex } from '../../models/user.model';
 
 @Component({
   selector: 'app-edit-user',
@@ -14,7 +14,7 @@ import { UserItem, UserRecord } from '../../models/user.model';
 })
 export class EditUserComponent {
   userId: number | null = null;
-  userWrapper: UserRecord | null = null;
+  userWrapper: UserEdit | null = null;
 
   constructor(private route: ActivatedRoute, private usersService: UsersService, private router: Router) {
     const idStr = this.route.snapshot.paramMap.get('id');
@@ -28,7 +28,8 @@ export class EditUserComponent {
 
   saveUser() {
     if (!this.userId || !this.userWrapper) return;
-    this.usersService.updateUser(this.userId, this.userWrapper.User).subscribe({
+    // Send the full UserEdit payload to the backend save/update endpoint
+    this.usersService.updateUser(this.userId, this.userWrapper).subscribe({
       next: () => this.router.navigate(['/users']),
       error: (err) => { console.error(err); alert('Failed to update user'); }
     });

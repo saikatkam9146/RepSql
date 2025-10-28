@@ -5,31 +5,31 @@
     <div class="form-grid">
       <div>
   <label>User ID:</label>
-        <input type="number" [(ngModel)]="userWrapper.User.fnUserID" name="fnUserID" readonly />
-        <label>First Name:</label>
-        <input type="text" [(ngModel)]="userWrapper.User.fcFirstName" name="fcFirstName" />
+    <input type="number" [(ngModel)]="userWrapper.User.User.fnUserID" name="fnUserID" readonly />
+    <label>First Name:</label>
+    <input type="text" [(ngModel)]="userWrapper.User.User.fcFirstName" name="fcFirstName" />
   <label>User NT:</label>
-        <input type="text" [(ngModel)]="userWrapper.User.fcUserNT" name="fcUserNT" />
-        <label>Department:</label>
-  <input type="text" [(ngModel)]="userWrapper!.Department!.fcDepartmentName" name="fcDepartmentName" />
-        <label>Status:</label>
-        <input type="text" [(ngModel)]="userWrapper.User.fcApprovalStatus" name="fcApprovalStatus" />
-        <label>Run Console Permission:</label>
-        <input type="checkbox" [(ngModel)]="userWrapper.User.fnRunConsolePermission" name="fnRunConsolePermission" />
-        <label>TimeZone:</label>
-  <input type="text" [(ngModel)]="userWrapper!.TimeZoneOffset!.TimeZoneName" name="TimeZoneName" />
+    <input type="text" [(ngModel)]="userWrapper.User.User.fcUserNT" name="fcUserNT" />
+    <label>Department:</label>
+  <input type="text" [(ngModel)]="userWrapper.User.Department!.fcDepartmentName" name="fcDepartmentName" />
+    <label>Status:</label>
+    <input type="text" [(ngModel)]="userWrapper.User.User.fcApprovalStatus" name="fcApprovalStatus" />
+    <label>Run Console Permission:</label>
+    <input type="checkbox" [(ngModel)]="userWrapper.User.User.fnRunConsolePermission" name="fnRunConsolePermission" />
+    <label>TimeZone:</label>
+  <input type="text" [(ngModel)]="userWrapper.User.TimeZoneOffset!.TimeZoneName" name="TimeZoneName" />
       </div>
       <div>
         <label>Last Name:</label>
-        <input type="text" [(ngModel)]="userWrapper.User.fcLastName" name="fcLastName" />
-        <label>Email:</label>
-        <input type="email" [(ngModel)]="userWrapper.User.fcUserEmail" name="fcUserEmail" />
-        <label>Access:</label>
-  <input type="text" [(ngModel)]="userWrapper!.UserAccess!.fcAccessDescription" name="fcAccessDescription" />
-        <label>Comments:</label>
-        <input type="text" [(ngModel)]="userWrapper.User.fcComments" name="fcComments" />
-        <label>Developer:</label>
-        <input type="checkbox" [(ngModel)]="userWrapper.User.fbDeveloper" name="fbDeveloper" />
+    <input type="text" [(ngModel)]="userWrapper.User.User.fcLastName" name="fcLastName" />
+    <label>Email:</label>
+    <input type="email" [(ngModel)]="userWrapper.User.User.fcUserEmail" name="fcUserEmail" />
+    <label>Access:</label>
+  <input type="text" [(ngModel)]="userWrapper.User.UserAccess!.fcAccessDescription" name="fcAccessDescription" />
+    <label>Comments:</label>
+    <input type="text" [(ngModel)]="userWrapper.User.User.fcComments" name="fcComments" />
+    <label>Developer:</label>
+    <input type="checkbox" [(ngModel)]="userWrapper.User.User.fbDeveloper" name="fbDeveloper" />
       </div>
     </div>
     <div class="form-actions">
