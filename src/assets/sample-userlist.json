@@ -31,12 +31,211 @@
         "daylight_Offset": -4
       },
       "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 101, "fcFirstName": "Alice", "fcLastName": "Johnson", "fcUserNT": "AJ01", "fcUserEmail": "alice.johnson@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 102, "fcFirstName": "Bob", "fcLastName": "Smith", "fcUserNT": "BS02", "fcUserEmail": "bob.smith@example.com", "fnDepartmentID": 3, "fnAccessID": 3, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 103, "fcFirstName": "Carol", "fcLastName": "Ng", "fcUserNT": "CN03", "fcUserEmail": "carol.ng@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": true, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 104, "fcFirstName": "David", "fcLastName": "Lee", "fcUserNT": "DL04", "fcUserEmail": "david.lee@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Inactive", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 105, "fcFirstName": "Eve", "fcLastName": "Martinez", "fcUserNT": "EM05", "fcUserEmail": "eve.martinez@example.com", "fnDepartmentID": 3, "fnAccessID": 4, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": true, "fbDeveloper": true, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 4, "fcAccessDescription": "Administrator Level" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 106, "fcFirstName": "Frank", "fcLastName": "Wong", "fcUserNT": "FW06", "fcUserEmail": "frank.wong@example.com", "fnDepartmentID": 2, "fnAccessID": 3, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 107, "fcFirstName": "Grace", "fcLastName": "Kim", "fcUserNT": "GK07", "fcUserEmail": "grace.kim@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 108, "fcFirstName": "Hector", "fcLastName": "Gomez", "fcUserNT": "HG08", "fcUserEmail": "hector.gomez@example.com", "fnDepartmentID": 3, "fnAccessID": 3, "fcApprovalStatus": "Inactive", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 109, "fcFirstName": "Iris", "fcLastName": "Lopez", "fcUserNT": "IL09", "fcUserEmail": "iris.lopez@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 110, "fcFirstName": "Jack", "fcLastName": "Miller", "fcUserNT": "JM10", "fcUserEmail": "jack.miller@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 111, "fcFirstName": "Karen", "fcLastName": "Young", "fcUserNT": "KY11", "fcUserEmail": "karen.young@example.com", "fnDepartmentID": 2, "fnAccessID": 3, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 112, "fcFirstName": "Leo", "fcLastName": "Brown", "fcUserNT": "LB12", "fcUserEmail": "leo.brown@example.com", "fnDepartmentID": 3, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 113, "fcFirstName": "Maya", "fcLastName": "Singh", "fcUserNT": "MS13", "fcUserEmail": "maya.singh@example.com", "fnDepartmentID": 1, "fnAccessID": 4, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": true, "fbDeveloper": true, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 4, "fcAccessDescription": "Administrator Level" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 114, "fcFirstName": "Nora", "fcLastName": "Zhang", "fcUserNT": "NZ14", "fcUserEmail": "nora.zhang@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Inactive", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 115, "fcFirstName": "Omar", "fcLastName": "Hassan", "fcUserNT": "OH15", "fcUserEmail": "omar.hassan@example.com", "fnDepartmentID": 3, "fnAccessID": 3, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 116, "fcFirstName": "Priya", "fcLastName": "Kaur", "fcUserNT": "PK16", "fcUserEmail": "priya.kaur@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 117, "fcFirstName": "Quinn", "fcLastName": "Reid", "fcUserNT": "QR17", "fcUserEmail": "quinn.reid@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 118, "fcFirstName": "Rita", "fcLastName": "Patel", "fcUserNT": "RP18", "fcUserEmail": "rita.patel@example.com", "fnDepartmentID": 3, "fnAccessID": 4, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 4, "fcAccessDescription": "Administrator Level" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 119, "fcFirstName": "Sam", "fcLastName": "Wilson", "fcUserNT": "SW19", "fcUserEmail": "sam.wilson@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 120, "fcFirstName": "Tina", "fcLastName": "Chen", "fcUserNT": "TC20", "fcUserEmail": "tina.chen@example.com", "fnDepartmentID": 2, "fnAccessID": 3, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": true, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    }
+  ],
+  "MoreUsersAdded": false,
+  "ExtraUsers": [
+    {
+      "User": { "fnUserID": 121, "fcFirstName": "Uma", "fcLastName": "Shah", "fcUserNT": "US21", "fcUserEmail": "uma.shah@example.com", "fnDepartmentID": 1, "fnAccessID": 2, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 122, "fcFirstName": "Vikram", "fcLastName": "Patel", "fcUserNT": "VP22", "fcUserEmail": "vikram.patel@example.com", "fnDepartmentID": 2, "fnAccessID": 3, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 123, "fcFirstName": "Wendy", "fcLastName": "Park", "fcUserNT": "WP23", "fcUserEmail": "wendy.park@example.com", "fnDepartmentID": 3, "fnAccessID": 2, "fcApprovalStatus": "Inactive", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 124, "fcFirstName": "Xavier", "fcLastName": "Lo", "fcUserNT": "XL24", "fcUserEmail": "xavier.lo@example.com", "fnDepartmentID": 1, "fnAccessID": 4, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": true, "fbDeveloper": true, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 4, "fcAccessDescription": "Administrator Level" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 125, "fcFirstName": "Yara", "fcLastName": "Al-Sayed", "fcUserNT": "YA25", "fcUserEmail": "yara.alsayed@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Pending", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 126, "fcFirstName": "Zane", "fcLastName": "Brown", "fcUserNT": "ZB26", "fcUserEmail": "zane.brown@example.com", "fnDepartmentID": 3, "fnAccessID": 3, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 1 },
+      "Department": { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 1, "TimeZoneCode": "PST", "TimeZoneName": "Pacific", "std_Offset": -8, "daylight_Offset": -7 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 127, "fcFirstName": "Aaron", "fcLastName": "Stone", "fcUserNT": "AS27", "fcUserEmail": "aaron.stone@example.com", "fnDepartmentID": 2, "fnAccessID": 2, "fcApprovalStatus": "Inactive", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 2 },
+      "Department": { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+      "UserAccess": { "fnAccessID": 2, "fcAccessDescription": "User" },
+      "TimeZoneOffset": { "TimeZoneID": 2, "TimeZoneCode": "EST", "TimeZoneName": "Eastern", "std_Offset": -5, "daylight_Offset": -4 },
+      "CurrentUserAccesslevel": null
+    },
+    {
+      "User": { "fnUserID": 128, "fcFirstName": "Bianca", "fcLastName": "Ruiz", "fcUserNT": "BR28", "fcUserEmail": "bianca.ruiz@example.com", "fnDepartmentID": 1, "fnAccessID": 3, "fcApprovalStatus": "Approved", "fcComments": null, "fnRunConsolePermission": false, "fbDeveloper": false, "TimeZoneID": 3 },
+      "Department": { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+      "UserAccess": { "fnAccessID": 3, "fcAccessDescription": "Manager" },
+      "TimeZoneOffset": { "TimeZoneID": 3, "TimeZoneCode": "CST", "TimeZoneName": "Central", "std_Offset": -6, "daylight_Offset": -5 },
+      "CurrentUserAccesslevel": null
     }
   ],
   "Departments": [
-    { "fnDepartmentID": 1, "fcDepartmentName": "S" },
-    { "fnDepartmentID": 2, "fcDepartmentName": "A g" },
-    { "fnDepartmentID": 3, "fcDepartmentName": "CC" }
+    { "fnDepartmentID": 1, "fcDepartmentName": "Sales" },
+    { "fnDepartmentID": 2, "fcDepartmentName": "Ang" },
+    { "fnDepartmentID": 3, "fcDepartmentName": "Customer Care" }
   ],
   "HasUserEditAccess": true
 }

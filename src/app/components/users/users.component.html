@@ -2,12 +2,16 @@
 <div class="users-container">
   <div class="users-header">
     <h2>Users</h2>
-    <button class="add-btn" (click)="openAddUser()" title="Add New User">
-      <span class="plus-icon">&#43;</span>
-    </button>
+    <div class="users-actions">
+      <input type="search" placeholder="Search..." [(ngModel)]="searchText" (ngModelChange)="onFilterChange()" class="search-box" />
+      <button class="add-btn" (click)="openAddUser()" title="Add New User">
+        <span class="plus-icon">&#43;</span>
+      </button>
+    </div>
   </div>
   <div *ngIf="loading">Loading users...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
+  <pre *ngIf="lastError" class="error-detail">{{ lastError | json }}</pre>
   <table>
     <thead>
       <tr>
@@ -24,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let user of users; let i = index">
+      <tr *ngFor="let user of pagedUsers; let i = index">
         <td>{{ user.User.fnUserID }}</td>
         <td>{{ user.User.fcFirstName }}</td>
         <td>{{ user.User.fcLastName }}</td>
@@ -43,6 +47,29 @@
     </tbody>
   </table>
 
+  <div class="table-footer">
+    <div class="pagination-left">
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+      <span>Page {{currentPage}} / {{ totalPages }}</span>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+    </div>
 
+    <div class="filters-right">
+      <label>Status:
+        <select [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="all">-- All --</option>
+        </select>
+      </label>
+
+      <label>Department:
+        <select [(ngModel)]="departmentFilter" (change)="onFilterChange()">
+          <option [ngValue]="'all'">-- All --</option>
+          <option *ngFor="let d of departments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
+        </select>
+      </label>
+    </div>
+  </div>
 
 </div>

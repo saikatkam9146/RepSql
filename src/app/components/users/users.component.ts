@@ -18,10 +18,20 @@ export class UsersComponent implements OnInit {
   }
   constructor(private router: Router, private usersService: UsersService) {}
   users: UserComplex[] = [];
+  departments: { fnDepartmentID: number; fcDepartmentName: string }[] = [];
   selectedUser: UserComplex | null = null;
   showDetailsPopup: boolean = false;
   loading = false;
   error: string | null = null;
+  lastError: any = null;
+  // Pagination
+  pageSize = 10;
+  currentPage = 1;
+
+  // Filters/search
+  statusFilter: 'all' | 'active' | 'inactive' = 'active'; // default to Active
+  departmentFilter: number | 'all' = 'all';
+  searchText = '';
 
   // Navigation to edit user page (to be implemented)
   navigateToEditUser(user: UserComplex, index: number) {
@@ -38,14 +48,65 @@ export class UsersComponent implements OnInit {
       next: (res: UserList) => {
         // API returns a UserList wrapper; use the Users array inside
         this.users = res?.Users || [];
+        this.departments = res?.Departments || [];
+        // default department list selection remains 'all'
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load users';
-        console.error(err);
+        // capture detailed error for debugging; the service logs full details already
+        this.lastError = err;
+        this.error = err?.message || 'Failed to load users';
+        console.error('UsersComponent.loadUsers error', err);
         this.loading = false;
       }
     });
+  }
+
+  // Derived list after applying search & filters
+  get filteredUsers(): UserComplex[] {
+    const term = this.searchText?.toLowerCase().trim();
+    return this.users.filter(u => {
+      // Status: interpret active as fcApprovalStatus === 'Approved'
+      if (this.statusFilter === 'active' && (u.User.fcApprovalStatus || '').toLowerCase() !== 'approved') return false;
+      if (this.statusFilter === 'inactive' && (u.User.fcApprovalStatus || '').toLowerCase() === 'approved') return false;
+
+      if (this.departmentFilter !== 'all' && u.User.fnDepartmentID !== this.departmentFilter) return false;
+
+      if (term) {
+        const vals = [
+          u.User.fnUserID?.toString() || '',
+          u.User.fcFirstName || '',
+          u.User.fcLastName || '',
+          u.User.fcUserEmail || '',
+          u.User.fcUserNT || '',
+          u.Department?.fcDepartmentName || '',
+          u.UserAccess?.fcAccessDescription || ''
+        ].join(' ').toLowerCase();
+        return vals.includes(term);
+      }
+      return true;
+    });
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredUsers.length / this.pageSize));
+  }
+
+  // Items for current page
+  get pagedUsers(): UserComplex[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredUsers.slice(start, start + this.pageSize);
+  }
+
+  goToPage(page: number) {
+    if (page < 1) page = 1;
+    if (page > this.totalPages) page = this.totalPages;
+    this.currentPage = page;
+  }
+
+  // When filters/search change, reset to page 1
+  onFilterChange() {
+    this.currentPage = 1;
   }
 
   openDetailsPopup(user: UserComplex) {

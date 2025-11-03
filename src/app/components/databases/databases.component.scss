@@ -119,3 +119,36 @@ tr:hover {
   padding: 1rem;
   margin-top: 1rem;
 }
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+.pagination-left button {
+  padding: 0.35rem 0.6rem;
+  margin-right: 0.5rem;
+}
+.filters-right {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.filters-right select {
+  padding: 0.3rem 0.5rem;
+}
+
+.error {
+  color: #b00020;
+  margin-top: 0.5rem;
+}
+.error-detail {
+  background: #fff6f6;
+  border: 1px solid #f2c2c2;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  max-height: 160px;
+  overflow: auto;
+  font-size: 0.85rem;
+}

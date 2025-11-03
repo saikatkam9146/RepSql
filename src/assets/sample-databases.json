@@ -1,0 +1,28 @@
+[
+  {
+    "fnConnectionID": 1272,
+    "fcConnectionName": "SQLScheduler",
+    "fcConnectionType": "SQL Server",
+    "fcProvider": "System.Data.SqlClient",
+    "fcDataSource": "db-RSabcd, 3085",
+    "fcInitialCatalog": "SQLScheduler",
+    "fcIntegratedSecurity": "TRUE",
+    "fcTrustedConnection": "TRUE",
+    "fnDatabaseActive": true,
+    "fdLastUpdate": "2025-02-28T13:50:57.247",
+    "fcSchema": "dbo"
+  },
+  {
+    "fnConnectionID": 1273,
+    "fcConnectionName": "SQLScheduler2",
+    "fcConnectionType": "SQL Server",
+    "fcProvider": "System.Data.SqlClient",
+    "fcDataSource": "db-sgb-t, 3085",
+    "fcInitialCatalog": "SQLScheduler2",
+    "fcIntegratedSecurity": "TRUE",
+    "fcTrustedConnection": "TRUE",
+    "fnDatabaseActive": true,
+    "fdLastUpdate": "2025-03-01T09:12:11.000",
+    "fcSchema": "dbo"
+  }
+]
