@@ -1,112 +1,71 @@
+# Recent Q&A (last 3–4 exchanges) and paging/filtering notes
 
-# Recent Q&A
+Date: 2025-11-04
 
-This file contains copies of the last two messages (a user question and the assistant's response) so you can keep them alongside the code.
-
----
-
-## Question
-
-I have the postman installed can something be done from this?
-
-
-### Assistant's response
-
-Yes — Postman is very useful here. It doesn’t enforce browser CORS rules (so it won’t “fail” like the browser), but it will let you:
-
-- Verify that the API is listening and returns the CORS headers (OPTIONS preflight).
-- Verify the POST path and Windows-auth (NTLM) behavior and response headers (WWW-Authenticate, etc.).
-- Capture the exact status + response headers/body to paste here so I can diagnose and give the exact Web API/IIS change needed.
-
-Do these three quick Postman checks and paste the results (status + response headers + body) for each — I’ll interpret them and tell you the minimal change to fix the browser error.
-
-Step A — OPTIONS (preflight) test
-1. In Postman create a new request.
-2. Method: OPTIONS
-3. URL:
-   http://localhost:55009/api/user/getusers
-4. Add these request headers (key → value):
-   - Origin: http://localhost:4200
-   - Access-Control-Request-Method: POST
-   - Access-Control-Request-Headers: Content-Type, Authorization
-5. Send the request.
-6. What to copy back here:
-   - Response status (200? 401? 404? connection refused?)
-   - Response headers (the full list; especially any Access-Control-* headers)
-   - Response body (if any)
-
-What to expect:
-- Success (good): status 200 and headers include:
-  - Access-Control-Allow-Origin: http://localhost:4200
-  - Access-Control-Allow-Credentials: true
-  - Access-Control-Allow-Methods: GET, POST, OPTIONS, ...
-  - Access-Control-Allow-Headers: Content-Type, Authorization (or echo)
-- If you do NOT see those headers, the browser will fail the preflight. Paste the response headers and I’ll tell you why.
-
-Step B — POST with NTLM (actual call, simulating browser POST)
-1. New request in Postman.
-2. Method: POST
-3. URL:
-   http://localhost:55009/api/user/getusers
-4. Authorization tab → select “NTLM Auth”:
-   - Username: abc87
-   - Password: password
-   - Domain: (if you have a domain enter it, otherwise try blank or your machine name)
-   - Workstation: optional
-5. Body: leave empty (Postman Body → none) — this sends no body (like Content-Length: 0).
-6. Add header:
-   - Origin: http://localhost:4200
-7. Send the request.
-8. Copy back:
-   - Response status (200, 401, 403, etc.)
-   - Response headers (look for WWW-Authenticate if 401)
-   - Response body
-
-Notes:
-- Postman will not be blocked by CORS. But by including the Origin header you can see if the server echoes Access-Control-Allow-Origin in responses.
-- If POST returns 401, copy the WWW-Authenticate header(s). If 200, copy response body.
-
-Step C — POST without credentials (control)
-1. Same as Step B but set Authorization to “No Auth”.
-2. Send and copy response status + headers.
-3. This helps distinguish “CORS vs Auth” problems.
-
-If any request returns connection errors (cannot connect) that means the API is not reachable on that host/port — confirm the API is running and listening. If Postman gets a 200 for the POST but browser still fails, it’s definitely a CORS preflight issue (server needs Access-Control-Allow-* headers on OPTIONS).
-
-What to paste here
-- Exact STATUS and full RESPONSE HEADERS for OPTIONS and POST runs.
-- If POST returns 401 include the WWW-Authenticate header and the full response body (if any).
-- If you see Access-Control-Allow-Origin but value is "*", tell me — I’ll explain why that won’t work with credentials.
-
-After you paste those outputs I’ll:
-- Tell you whether preflight works.
-- If not working, give the precise change (PreflightRequestsHandler, web.config/IIS Express snippet, or WebApiConfig change) adapted to the actual headers/status you returned.
-- If preflight is fine but POST returns 401, give instructions for browser-side or server-side changes to allow NTLM from the browser (IIS, browser intranet settings, or domain/workstation settings).
-
-If you want, I can also create screenshot-style instructions for NTLM in Postman or a sample curl command, but the Postman steps above will give me everything I need to diagnose.
+This document contains the most recent 3–4 question/answer exchanges from our session (copied for traceability), followed by a concise pointer to where paging and filtering logic lives in the frontend code and what it does.
 
 ---
 
+## Q&A 1 — How to open IIS on my local API machine
+
+Q: how to open IIS in my local api machine
+
+A (summary):
+- GUI: Press Win, type "IIS" and open "Internet Information Services (IIS) Manager" or press Win+R and run `inetmgr`.
+- PowerShell (quick): `Start-Process inetmgr`.
+- If `inetmgr` is missing, enable IIS Management Console via Control Panel → "Turn Windows features on or off" or use DISM/PowerShell to install features (run as Administrator):
+
+```powershell
+# as Admin
+dism /online /enable-feature /featurename:IIS-ManagementConsole /all
+dism /online /enable-feature /featurename:IIS-WebServer /all
+dism /online /enable-feature /featurename:IIS-WindowsAuthentication /all
+```
+
+- If you use IIS Express (Visual Studio), use the system-tray IIS Express icon and check `.vs/<Solution>/config/applicationhost.config` or `%USERPROFILE%\Documents\IISExpress\config`.
+
+- How to change authentication (quick dev/test): select site in IIS Manager → Authentication → enable/disable Anonymous or Windows Authentication. For CORS preflight testing you can temporarily enable Anonymous while keeping Windows Auth enabled so OPTIONS can be served anonymously and POST/GET still require auth.
+
 ---
 
-## Question 2
+## Q&A 2 — Windows can't find `inetmgr`
 
-Okay but where to add this PreflightRequestsHandler class in web api and do we have to register it somewhere or use it somewhere in the project?
+Q: windows cant find inetmgr
 
+A (summary):
+- If `inetmgr` isn't available, install the IIS Management Console as described above (Control Panel → Turn Windows features on or off OR use the DISM commands). After installing, run `Start-Process inetmgr` or `inetmgr` again to open the GUI.
+- Confirm presence with PowerShell:
 
-### Assistant's response
+```powershell
+Test-Path 'C:\Windows\System32\inetsrv\InetMgr.exe'
+```
 
-Good — here are exact, copy-paste ready instructions for adding the PreflightRequestsHandler class to a Web API 2 (.NET Framework) project and registering it so OPTIONS requests are short-circuited with the correct CORS headers.
+- If you only need to run the API locally via Visual Studio, IIS Express may be sufficient and no full IIS is required.
 
-Where to add the class
-- Add a new C# file anywhere under your Web API project. Common places:
-  - ProjectRoot\App_Start\Handlers\PreflightRequestsHandler.cs
-  - ProjectRoot\Handlers\PreflightRequestsHandler.cs
-- The folder doesn't matter to runtime as long as the file is included in the project and compiled. I recommend App_Start or a new Handlers folder so it's easy to find.
+---
 
-PreflightRequestsHandler.cs (copy/paste)
-- Replace "YourProjectNamespace" with your project's root namespace (you can find it in other files).
-- This handler will short-circuit OPTIONS requests and return the CORS headers (including Access-Control-Allow-Credentials) before authentication is required.
+## Q&A 3 — Using Postman to diagnose CORS / NTLM
+
+Q: I have the postman installed can something be done from this?
+
+A (summary):
+- Yes. Postman bypasses browser CORS enforcement so it helps verify server behavior for OPTIONS (preflight) and POST (NTLM) requests.
+- Suggested checks to paste back:
+  - OPTIONS preflight (method OPTIONS, set `Origin: http://localhost:4200`, `Access-Control-Request-Method: POST`, `Access-Control-Request-Headers: Content-Type, Authorization`) — expected: 200 with `Access-Control-Allow-Origin`, `Access-Control-Allow-Credentials`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`.
+  - POST with NTLM (NTLM auth in Postman) — expected: 200 when credentials are correct; check `WWW-Authenticate` header on 401 responses.
+  - POST without credentials (control) — to distinguish auth vs CORS problems.
+- Copy the exact status, response headers and body for diagnosis.
+
+---
+
+## Q&A 4 — Where to add `PreflightRequestsHandler` and register it
+
+Q: Okay but where to add this PreflightRequestsHandler class in web api and do we have to register it somewhere or use it somewhere in the project?
+
+A (summary / copy-paste-ready instructions):
+- Add a new C# file anywhere in your Web API project (e.g., `App_Start\\Handlers\\PreflightRequestsHandler.cs` or `Handlers\\PreflightRequestsHandler.cs`). Include it in the project and compile.
+- Handler behaviour: short-circuit `OPTIONS` requests and return `Access-Control-Allow-*` headers, including `Access-Control-Allow-Credentials: true`. Do not use `Access-Control-Allow-Origin: *` if credentials are needed.
+- Example DelegatingHandler (replace namespace):
 
 ```csharp
 using System.Net;
@@ -119,11 +78,7 @@ namespace YourProjectNamespace.Handlers
 {
     public class PreflightRequestsHandler : DelegatingHandler
     {
-        // Allowed origins (list exact origins you want to allow)
-        private static readonly string[] AllowedOrigins = new[] {
-            "http://localhost:4200",
-            "http://localhost:54732" // add other dev ports if used
-        };
+        private static readonly string[] AllowedOrigins = new[] { "http://localhost:4200" };
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -136,16 +91,10 @@ namespace YourProjectNamespace.Handlers
                 {
                     response.Headers.Add("Access-Control-Allow-Origin", origin);
                 }
-                else
-                {
-                    // If you want to allow a default origin for debugging, add it here.
-                    // response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:4200");
-                }
 
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 response.Headers.Add("Access-Control-Allow-Credentials", "true");
 
-                // Echo requested headers if present so the browser knows which are allowed
                 if (request.Headers.Contains("Access-Control-Request-Headers"))
                 {
                     var reqHeaders = string.Join(", ", request.Headers.GetValues("Access-Control-Request-Headers"));
@@ -167,77 +116,77 @@ namespace YourProjectNamespace.Handlers
 }
 ```
 
-How to register the handler
-- Edit your WebApiConfig.cs (usually in App_Start/WebApiConfig.cs). Register the handler as a message handler before other handlers and before route/config setup, for example:
+- Register it in `WebApiConfig.Register` before enabling CORS and routes:
 
 ```csharp
-using System.Web.Http;
-using YourProjectNamespace.Handlers; // add this
-
-public static class WebApiConfig
-{
-    public static void Register(HttpConfiguration config)
-    {
-        // 1) Add preflight handler first so OPTIONS are handled before auth
-        config.MessageHandlers.Add(new PreflightRequestsHandler());
-
-        // 2) Enable Web API CORS - make sure Microsoft.AspNet.WebApi.Cors is installed
-        var cors = new EnableCorsAttribute("http://localhost:4200", "Content-Type, Accept, Authorization", "GET,POST,PUT,DELETE,OPTIONS")
-        {
-            SupportsCredentials = true
-        };
-        config.EnableCors(cors);
-
-        // 3) Other Web API config (routes, formatters ...)
-        config.MapHttpAttributeRoutes();
-
-        config.Routes.MapHttpRoute(
-            name: "DefaultApi",
-            routeTemplate: "api/{controller}/{id}",
-            defaults: new { id = RouteParameter.Optional }
-        );
-    }
-}
+config.MessageHandlers.Add(new PreflightRequestsHandler());
+var cors = new EnableCorsAttribute("http://localhost:4200", "Content-Type, Accept, Authorization", "GET,POST,PUT,DELETE,OPTIONS") { SupportsCredentials = true };
+config.EnableCors(cors);
 ```
 
-Notes and important constraints
-- Do NOT use Access-Control-Allow-Origin: * when SupportsCredentials = true — the browser will refuse it. Use the exact origin (e.g., "http://localhost:4200").
-- The handler short-circuits only OPTIONS (preflight) requests. The real POST/GET requests will still go through normal authentication. That’s desired: OPTIONS needs to be allowed anonymously so the browser can learn the CORS policy; the actual request should still require Windows auth (and the browser will negotiate credentials).
-- If your app uses OWIN Startup class instead of WebApiConfig for configuration, register the message handler in your HttpConfiguration in Startup.cs the same way (config.MessageHandlers.Add(...)) before you call app.UseWebApi(config).
-- Make sure Microsoft.AspNet.WebApi.Cors package is installed (Install-Package Microsoft.AspNet.WebApi.Cors) — I included EnableCors usage above.
+- If IIS rejects OPTIONS with 401.2 before ASP.NET runs, either enable Anonymous Authentication temporarily for OPTIONS or add a targeted URL Rewrite rule allowing anonymous for OPTIONS. After OPTIONS returns CORS headers, the actual POST/GET will still require Windows Authentication.
 
-Rebuild, restart, and test
-1. Rebuild project in Visual Studio.
-2. Restart IIS Express or IIS hosting the Web API (stop and run again).
-3. Test OPTIONS from PowerShell (on the machine that will host the browser or from the API machine) — replace port and origin as needed:
+---
 
-```powershell
-$headers = @{
-  Origin = 'http://localhost:4200';
-  'Access-Control-Request-Method' = 'POST';
-  'Access-Control-Request-Headers' = 'content-type, authorization'
-}
-Invoke-WebRequest -Uri 'http://localhost:55009/api/user/getusers' -Method OPTIONS -Headers $headers -UseBasicParsing -ErrorAction Stop
-```
+## Where paging and filtering logic lives in the frontend (exact files & what they do)
 
-Expected response: status 200 and response headers should include:
-- Access-Control-Allow-Origin: http://localhost:4200
-- Access-Control-Allow-Credentials: true
-- Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-- Access-Control-Allow-Headers: content-type, authorization  (or echo of what you sent)
+I inspected the current frontend code and extracted the exact locations and logic for paging and filtering so you can point developers to the right spots.
 
-If this OPTIONS request returns the CORS headers, then open the browser, load your front-end at http://localhost:4200 and try the Users call again. The preflight should pass and the browser will then send the POST with credentials.
+1) Users page
+- File: `src/app/components/users/users.component.ts`
+- Key properties used for paging and filtering:
+  - Pagination:
+    - `pageSize = 10` (items per page)
+    - `currentPage = 1` (current page index)
+    - `get totalPages()` — returns Math.ceil(filteredUsers.length / pageSize)
+    - `get pagedUsers()` — slices the filtered list using `(currentPage - 1) * pageSize` and `slice(start, start + pageSize)` to return items for the current page
+    - `goToPage(page: number)` — sets `currentPage` with bounds checking
+    - `onFilterChange()` — called when filters/search change; resets `currentPage = 1`
 
-If after this the POST returns 401/403:
-- That means CORS is fixed but the Windows auth credentials were not accepted or the browser didn’t send them. Check:
-  - Browser settings: Chrome/Edge . Ensure automatic Windows Integrated Authentication is allowed for the host (add to Intranet sites or configure chrome flags).
-  - Confirm `withCredentials: true` is present in client requests (your Angular services already set it).
-  - Check server logs to see if a 401 challenge occurred and what identity is being presented.
+  - Filters & search:
+    - `statusFilter: 'all' | 'active' | 'inactive'` — default `'active'`
+    - `departmentFilter: number | 'all'` — `'all'` default
+    - `searchText: string` — free-text search
+    - `get filteredUsers()` — returns `this.users.filter(...)` where each user is tested:
+      - Status: checks `u.User.fcApprovalStatus` to interpret 'Approved' as active
+      - Department: compares `u.User.fnDepartmentID` to `departmentFilter` when not 'all'
+      - Search: concatenates relevant fields (`fnUserID`, `fcFirstName`, `fcLastName`, `fcUserEmail`, `fcUserNT`, department name, access desc) into a single lowercase string and checks `includes(searchText)`
 
-If you prefer, I can:
-- Produce the exact two-file patch (create PreflightRequestsHandler.cs + modified WebApiConfig.cs) formatted for copy/paste into Visual Studio.
-- Provide an alternate message handler that reads allowed origins from web.config/appSettings so you don't hard-code ports.
+- Where used in template: `pagedUsers` is rendered in the table; paging controls call `goToPage`; filter inputs call `onFilterChange()`.
 
-Tell me which you want:
-- I will generate the ready-to-paste files for you (PreflightRequestsHandler + WebApiConfig diff), or
-- You will add the class and register it yourself and paste the PowerShell OPTIONS response here for verification.
+2) Databases page
+- File: `src/app/components/databases/databases.component.ts`
+- Key properties used for paging and filtering:
+  - Pagination:
+    - `pageSize = 10`
+    - `currentPage = 1`
+    - `get totalPages()` — uses `filteredDatabases.length`
+    - `get pagedDatabases()` — slices `filteredDatabases` for the page
+    - `goToPage(page: number)` and `onFilterChange()` similar to Users
+
+  - Filters:
+    - `statusFilter: 'all' | 'active' | 'inactive'` — default `'active'`
+    - `get filteredDatabases()` — filters by boolean `fnDatabaseActive` according to `statusFilter`
+
+- Where used in template: `pagedDatabases` is used to render table rows; controls call `goToPage` and `onFilterChange`.
+
+Notes on behavior & edge cases handled
+- When filters/search change, code resets to page 1 to avoid empty page results.
+- `totalPages` is clamped to at least 1 (Math.max(1, Math.ceil(...))) to avoid division-by-zero or zero-page UI.
+- Search is case-insensitive and trims the search term.
+- Page navigation bounds are checked in `goToPage` to remain within 1..totalPages.
+
+If you want, I can also add a short README section with a code snippet that explains how to change `pageSize` or how to wire server-side pagination (if you prefer to move to server-side paging later).
+
+---
+
+## Next actions you asked for (and what I already did)
+
+- You asked: "copy all to questions.md erase previous and commit and push to repo" — this file contains the requested entries and will be committed & pushed.
+- You also asked: "last 3 to 4 questions conversations I needed also add where and what logic is used for paging and filtering in our code in questions.md and push it" — that is included above.
+
+If you'd like changes to wording, or to include additional Q&A slices (older or newer), say which ones and I'll append them and push again.
+
+---
+
+End of document.
