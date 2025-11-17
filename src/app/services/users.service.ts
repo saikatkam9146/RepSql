@@ -18,6 +18,15 @@ export class UsersService {
   // In-memory fallback cache loaded from assets/sample-userlist.json when backend is unavailable.
   private fallbackCache: UserList | null = null;
 
+  // Small default mapping to pre-populate DatabaseAccess for specific users in the fallback.
+  // Keyed by userId -> connectionId -> access flags.
+  // Example: { 101: { 1: { fbImportAccess: true, fbExportAccess: false } } }
+  private defaultDbAccessMap: { [userId: number]: { [connId: number]: { fbImportAccess: boolean; fbExportAccess: boolean } } } = {
+    // sample entries (edit or expand as needed)
+    101: { 1: { fbImportAccess: true, fbExportAccess: false }, 2: { fbImportAccess: false, fbExportAccess: true } },
+    102: { 1: { fbImportAccess: false, fbExportAccess: true } }
+  };
+
   // The backend exposes a POST endpoint for retrieving users
   // POST http://localhost:55009/api/user/getusers
   // Returns a UserList wrapper object
@@ -69,13 +78,15 @@ export class UsersService {
       if (!found) return null;
 
       // Build DatabaseAccessComplex list: default import/export false unless the user record contains specific info
+      const mapping = this.defaultDbAccessMap[found.User.fnUserID] || {};
       const dbAccessList: DatabaseAccessComplex[] = (dbs || []).map(d => {
+        const pre = mapping[d.fnConnectionID || -1];
         const access: DatabaseAccess = {
           fnDatabaseAccessID: undefined,
           fnUserID: found.User.fnUserID,
           fnConnectionID: d.fnConnectionID,
-          fbImportAccess: false,
-          fbExportAccess: false
+          fbImportAccess: !!pre?.fbImportAccess,
+          fbExportAccess: !!pre?.fbExportAccess
         };
         return { DatabaseConnection: d, DatabaseAccess: access } as DatabaseAccessComplex;
       });
