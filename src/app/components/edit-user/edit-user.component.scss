@@ -1,52 +1,83 @@
-.edit-user-container {
-  margin: 2rem auto;
-  max-width: 500px;
+.edit-user-fullpage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fb;
+}
+.page-header {
+  padding: 1rem 2rem;
   background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-.edit-user-container h2 {
+.edit-user-form {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 2rem;
+}
+.top-section {
+  display: flex;
+  gap: 1.5rem;
+  /* occupy ~35% of viewport height */
+  min-height: 35vh;
+  max-height: 40vh;
+}
+.overview, .authorization {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.overview {
+  flex: 1.6; /* larger column */
+}
+.authorization {
+  flex: 1; /* narrower column */
+}
+.overview h3, .authorization h3 {
   margin-top: 0;
+  margin-bottom: 0.5rem;
 }
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+.field {
+  margin-bottom: 0.75rem;
 }
-.form-grid label {
+.field label {
   display: block;
-  margin-top: 1rem;
+  font-weight: 600;
   margin-bottom: 0.25rem;
-  font-weight: 500;
 }
-.form-grid input[type="text"],
-.form-grid input[type="email"],
-.form-grid input[type="number"] {
+.field input[type="text"], .field input[type="email"], .field select, .field textarea {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
+  padding: 0.45rem;
+  border: 1px solid #d0d7de;
   border-radius: 4px;
-  margin-bottom: 1rem;
 }
-.form-grid input[type="checkbox"] {
-  margin-right: 0.5rem;
+.field textarea { min-height: 4rem; }
+
+.bottom-section {
+  flex: 1 1 auto;
+  background: transparent;
 }
+.db-table {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  height: 100%;
+  overflow: auto;
+}
+.db-row { display: flex; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f0f2f4; }
+.db-row.db-header { font-weight: 700; border-bottom: 2px solid #e6e9ec; }
+.db-row .col { padding: 0 0.5rem; }
+.db-row .col.name { flex: 2; }
+.db-row .col.import, .db-row .col.export { flex: 0 0 80px; text-align: center; }
+
 .form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
 }
-.form-actions button {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  background: #1976d2;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-.form-actions button:hover {
-  background: #1565c0;
-}
+.form-actions .save { background: #1976d2; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; }
+.form-actions .cancel { background: transparent; border: 1px solid #ccc; padding: 0.45rem 0.9rem; border-radius: 4px; }
