@@ -34,14 +34,17 @@ export class UsersService {
         url: url,
         error: err?.error
       });
-      // Fall back to local asset for offline/dev testing
-      return this.http.get<UserList>('/assets/sample-userlist.json').pipe(catchError(innerErr => {
+      // Try localStorage cache first
+      const cached = this.loadFallbackFromLocalStorage();
+      if (cached) return of(cached);
+      // Fall back to local asset for offline/dev testing; cache it when loaded
+      return this.http.get<UserList>('/assets/sample-userlist.json').pipe(map(list => {
+        try { this.saveFallbackToLocalStorage(list); } catch (e) { /* ignore */ }
+        return list;
+      }), catchError(innerErr => {
         console.error('Fallback asset read failed', innerErr);
         return of({ Users: [], Departments: [], HasUserEditAccess: false } as UserList);
-      }),
-      // when the asset is successfully loaded, cache it for offline updates
-      // (we use map-like side-effect via subscribe below)
-      );
+      }));
     }));
   }
 
@@ -60,8 +63,12 @@ export class UsersService {
   // Construct a UserEdit from local sample assets when the backend is unavailable.
   getUserEditFromFallback(id: number): Observable<UserEdit | null> {
     // load sample user list and sample databases in parallel
+    // prefer cached fallback list if present
+    const cached = this.loadFallbackFromLocalStorage();
+    const users$ = cached ? of(cached) : this.http.get<UserList>('/assets/sample-userlist.json').pipe(map(list => { try { this.saveFallbackToLocalStorage(list); } catch{} return list;}), catchError(_ => of({ Users: [], Departments: [], HasUserEditAccess: false } as UserList)));
+
     return forkJoin({
-      users: this.http.get<UserList>('/assets/sample-userlist.json'),
+      users: users$,
       dbs: this.http.get<DatabaseConnection[]>('/assets/sample-databases.json'),
       mapping: this.http.get<Record<string, Record<string, { fbImportAccess: boolean; fbExportAccess: boolean }>>>('/assets/default-db-access.json').pipe(catchError(_ => of({})))
     }).pipe(map(({ users, dbs, mapping }) => {
@@ -99,6 +106,30 @@ export class UsersService {
       console.error('getUserEditFromFallback failed', e);
       return of(null);
     }));
+  }
+
+  // Local storage helpers for fallback persistence
+  private loadFallbackFromLocalStorage(): UserList | null {
+    try {
+      if (this.fallbackCache) return this.fallbackCache;
+      const raw = localStorage.getItem('users.fallback');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as UserList;
+      this.fallbackCache = parsed;
+      return parsed;
+    } catch (e) {
+      console.error('loadFallbackFromLocalStorage failed', e);
+      return null;
+    }
+  }
+
+  private saveFallbackToLocalStorage(list: UserList) {
+    try {
+      this.fallbackCache = list;
+      localStorage.setItem('users.fallback', JSON.stringify(list));
+    } catch (e) {
+      console.error('saveFallbackToLocalStorage failed', e);
+    }
   }
 
   // The backend uses a single save endpoint for creating/updating users (example: POST /api/saveuser)
@@ -146,8 +177,8 @@ export class UsersService {
                   if ((payload as any).User) list.Users.push((payload as any).User as UserComplex);
                 }
               }
-              // cache for further offline edits during this session
-              this.fallbackCache = list;
+              // cache for further offline edits during this session and persist to localStorage
+              this.saveFallbackToLocalStorage(list);
               observer.next({ offlineSaved: true });
               observer.complete();
             } catch (e) {
