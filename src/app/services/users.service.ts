@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { UserRecord, UserItem, UserList, UserEdit, UserComplex } from '../models/user.model';
+import { Observable, of, throwError, forkJoin } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { UserRecord, UserItem, UserList, UserEdit, UserComplex, DatabaseConnection, DatabaseAccessComplex, DatabaseAccess } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
@@ -50,6 +50,47 @@ export class UsersService {
     // send id in the body as { id: <number> } which matches common Web API POST patterns
     return this.http.post<UserEdit>(url, { id }, { withCredentials: true }).pipe(catchError(err => {
       console.error('getUser failed', { message: err?.message, status: err?.status, url, error: err?.error });
+      // Attempt to return a constructed UserEdit from local sample assets so edit page can be tested offline
+      return this.getUserEditFromFallback(id);
+    }));
+  }
+
+  // Construct a UserEdit from local sample assets when the backend is unavailable.
+  getUserEditFromFallback(id: number): Observable<UserEdit | null> {
+    // load sample user list and sample databases in parallel
+    return forkJoin({
+      users: this.http.get<UserList>('/assets/sample-userlist.json'),
+      dbs: this.http.get<DatabaseConnection[]>('/assets/sample-databases.json')
+    }).pipe(map(({ users, dbs }) => {
+      // cache users list for potential offline updates
+      this.fallbackCache = users;
+
+      const found = users.Users.find(u => u.User.fnUserID === id);
+      if (!found) return null;
+
+      // Build DatabaseAccessComplex list: default import/export false unless the user record contains specific info
+      const dbAccessList: DatabaseAccessComplex[] = (dbs || []).map(d => {
+        const access: DatabaseAccess = {
+          fnDatabaseAccessID: undefined,
+          fnUserID: found.User.fnUserID,
+          fnConnectionID: d.fnConnectionID,
+          fbImportAccess: false,
+          fbExportAccess: false
+        };
+        return { DatabaseConnection: d, DatabaseAccess: access } as DatabaseAccessComplex;
+      });
+
+      const ue: UserEdit = {
+        User: found,
+        DatabaseAccess: dbAccessList,
+        Departments: users.Departments || [],
+        UserAccess: [],
+        TimeZone: []
+      };
+
+      return ue;
+    }), catchError(e => {
+      console.error('getUserEditFromFallback failed', e);
       return of(null);
     }));
   }
