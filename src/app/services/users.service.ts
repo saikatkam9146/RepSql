@@ -18,14 +18,7 @@ export class UsersService {
   // In-memory fallback cache loaded from assets/sample-userlist.json when backend is unavailable.
   private fallbackCache: UserList | null = null;
 
-  // Small default mapping to pre-populate DatabaseAccess for specific users in the fallback.
-  // Keyed by userId -> connectionId -> access flags.
-  // Example: { 101: { 1: { fbImportAccess: true, fbExportAccess: false } } }
-  private defaultDbAccessMap: { [userId: number]: { [connId: number]: { fbImportAccess: boolean; fbExportAccess: boolean } } } = {
-    // sample entries (edit or expand as needed)
-    101: { 1: { fbImportAccess: true, fbExportAccess: false }, 2: { fbImportAccess: false, fbExportAccess: true } },
-    102: { 1: { fbImportAccess: false, fbExportAccess: true } }
-  };
+  // Mapping file is kept in `src/assets/default-db-access.json` so non-developers can edit defaults.
 
   // The backend exposes a POST endpoint for retrieving users
   // POST http://localhost:55009/api/user/getusers
@@ -69,8 +62,9 @@ export class UsersService {
     // load sample user list and sample databases in parallel
     return forkJoin({
       users: this.http.get<UserList>('/assets/sample-userlist.json'),
-      dbs: this.http.get<DatabaseConnection[]>('/assets/sample-databases.json')
-    }).pipe(map(({ users, dbs }) => {
+      dbs: this.http.get<DatabaseConnection[]>('/assets/sample-databases.json'),
+      mapping: this.http.get<Record<string, Record<string, { fbImportAccess: boolean; fbExportAccess: boolean }>>>('/assets/default-db-access.json').pipe(catchError(_ => of({})))
+    }).pipe(map(({ users, dbs, mapping }) => {
       // cache users list for potential offline updates
       this.fallbackCache = users;
 
@@ -78,9 +72,10 @@ export class UsersService {
       if (!found) return null;
 
       // Build DatabaseAccessComplex list: default import/export false unless the user record contains specific info
-      const mapping = this.defaultDbAccessMap[found.User.fnUserID] || {};
+      // mappingObj is expected to be { "<userId>": { "<connId>": { fbImportAccess, fbExportAccess }}}
+  const mappingObj = (mapping || {}) as Record<string, Record<string, { fbImportAccess: boolean; fbExportAccess: boolean }>>;
       const dbAccessList: DatabaseAccessComplex[] = (dbs || []).map(d => {
-        const pre = mapping[d.fnConnectionID || -1];
+        const pre = mappingObj[String(found.User.fnUserID)]?.[String(d.fnConnectionID || '')];
         const access: DatabaseAccess = {
           fnDatabaseAccessID: undefined,
           fnUserID: found.User.fnUserID,

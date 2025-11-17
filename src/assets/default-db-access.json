@@ -1,0 +1,9 @@
+{
+  "101": {
+    "1": { "fbImportAccess": true, "fbExportAccess": false },
+    "2": { "fbImportAccess": false, "fbExportAccess": true }
+  },
+  "102": {
+    "1": { "fbImportAccess": false, "fbExportAccess": true }
+  }
+}
