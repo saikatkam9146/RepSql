@@ -37,10 +37,12 @@ export class UsersService {
     }));
   }
 
-  // The backend may return a UserEdit payload for a single user's edit view
+  // The backend may return a UserEdit payload for a single user's edit view.
+  // Some APIs expose this as a POST (body contains id) rather than a GET. Use POST to match the API that expects GetUser(int id) via POST.
   getUser(id: number): Observable<UserEdit | null> {
-    const url = `${this.base}/getuser/${id}`;
-    return this.http.get<UserEdit>(url, { withCredentials: true }).pipe(catchError(err => {
+    const url = `${this.base}/getuser`;
+    // send id in the body as { id: <number> } which matches common Web API POST patterns
+    return this.http.post<UserEdit>(url, { id }, { withCredentials: true }).pipe(catchError(err => {
       console.error('getUser failed', { message: err?.message, status: err?.status, url, error: err?.error });
       return of(null);
     }));
