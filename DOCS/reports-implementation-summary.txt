@@ -1,0 +1,40 @@
+Progress update — what I changed and verified
+
+- Added a new Reports service and components:
+  - New service: `src/app/services/reports.service.ts` — implements:
+    - hasApplicationAccess() (GET) with fallback,
+    - getSetupData() (POST) with fallback to `src/assets/sample-setupdata.json`,
+    - getReports(query) (POST) with fallback to `src/assets/sample-reports.json`.
+  - New component: `src/app/components/reports/reports.component.ts` — standalone component that:
+    - Calls HasApplicationAccess → GetSetupData → GetReports,
+    - Loads persisted ReportQueryOptions from localStorage (uses the `ReportQueryOptions` model you requested earlier),
+    - Renders a table with columns: ID, Name, When, Owner, Department, Email, Last, Duration and a view (eye) action.
+    - Implements formatting for the When column (month/week/hour/minute/adhoc heuristics).
+  - New detail component: `src/app/components/report-detail/report-detail.component.ts` — minimal placeholder for the view route.
+  - Updated routes: `src/app/app.routes.ts` now lazy-loads the new `ReportsComponent` and adds `reports/view/:id` route for the detail view.
+- Added assets earlier: `src/assets/sample-reports.json` and `src/assets/sample-setupdata.json` (they're used by the service fallbacks).
+- Ran a TypeScript type-check: no errors were reported.
+
+Notes on behavior and assumptions
+- API endpoints used:
+  - GET  /api/report/hasapplicationaccess
+  - POST /api/report/getsetupdata
+  - POST /api/report/getreports  (body: ReportQueryOptions)
+  These are called with credentials (withCredentials: true) to support Windows-auth flows; fallbacks are used when calls fail.
+- The component loads persisted query filters from localStorage keys similar to your old app (Status, Type, TypeDayOfWeek, TypeDayOfMonth, User, Department, Database, Server, SearchTerm, Skip). It uses the `defaultReportQueryOptions()` you had me add earlier for default Take/Skip/OrderBy settings.
+- The When column rendering is best-effort (month/week/hour/minute/adhoc). If you have specific schedule formatting rules (e.g., recurring-first-day special cases), I can adapt it to match exactly.
+- The view icon navigates to a minimal detail page at `/reports/view/:id`. That placeholder can be expanded into a full editor/details view when you provide the fields you want to show.
+
+What I didn't change (but can do next on request)
+- Add filter UI (dropdowns for Status, Type, User, Department, Database, Server) and paging controls. Right now the component loads the list once using persisted query options.
+- Wire sorting and pagination controls (Take/Skip/OrderBy).
+- Improve the When formatting for all scheduling permutations (I implemented the most common patterns).
+- Implement a full report detail editor view (the detail component is a placeholder).
+- Add unit tests for the service/component.
+
+Next steps — pick one
+- I can add a basic filter bar and paging controls and wire them to update localStorage and re-run GetReports.
+- I can expand the report detail page to fetch a single report (GetReport) and show full fields.
+- I can add styles or move the table into an Angular Material table for better UX.
+
+Which would you like me to implement next?

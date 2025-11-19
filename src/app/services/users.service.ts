@@ -81,7 +81,8 @@ export class UsersService {
       // Build DatabaseAccessComplex list: default import/export false unless the user record contains specific info
       // mappingObj is expected to be { "<userId>": { "<connId>": { fbImportAccess, fbExportAccess }}}
   const mappingObj = (mapping || {}) as Record<string, Record<string, { fbImportAccess: boolean; fbExportAccess: boolean }>>;
-      const dbAccessList: DatabaseAccessComplex[] = (dbs || []).map(d => {
+      // Build initial DatabaseAccessComplex list using mapping defaults
+      let dbAccessList: DatabaseAccessComplex[] = (dbs || []).map(d => {
         const pre = mappingObj[String(found.User.fnUserID)]?.[String(d.fnConnectionID || '')];
         const access: DatabaseAccess = {
           fnDatabaseAccessID: undefined,
@@ -92,6 +93,27 @@ export class UsersService {
         };
         return { DatabaseConnection: d, DatabaseAccess: access } as DatabaseAccessComplex;
       });
+
+      // If the user previously edited DB access while offline, overlay saved values so their choices persist
+      try {
+        const saved = this.loadUserDbAccessFromLocalStorage(found.User.fnUserID);
+        if (saved && saved.length) {
+          const byConn = new Map<number | undefined, DatabaseAccessComplex>();
+          saved.forEach(s => byConn.set(s.DatabaseAccess?.fnConnectionID, s));
+          dbAccessList = dbAccessList.map(dac => {
+            const existing = byConn.get(dac.DatabaseAccess?.fnConnectionID);
+            if (existing && existing.DatabaseAccess) {
+              dac.DatabaseAccess = Object.assign({}, dac.DatabaseAccess, {
+                fbImportAccess: !!existing.DatabaseAccess.fbImportAccess,
+                fbExportAccess: !!existing.DatabaseAccess.fbExportAccess
+              });
+            }
+            return dac;
+          });
+        }
+      } catch (e) {
+        console.error('Applying saved DB access overlay failed', e);
+      }
 
       const ue: UserEdit = {
         User: found,
@@ -129,6 +151,30 @@ export class UsersService {
       localStorage.setItem('users.fallback', JSON.stringify(list));
     } catch (e) {
       console.error('saveFallbackToLocalStorage failed', e);
+    }
+  }
+
+  // Per-user DatabaseAccess persistence for offline edits. Stored as a map: { "<userId>": DatabaseAccessComplex[] }
+  private loadUserDbAccessFromLocalStorage(userId: number): DatabaseAccessComplex[] | null {
+    try {
+      const raw = localStorage.getItem('users.dbAccess');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Record<string, DatabaseAccessComplex[]>;
+      return parsed[String(userId)] || null;
+    } catch (e) {
+      console.error('loadUserDbAccessFromLocalStorage failed', e);
+      return null;
+    }
+  }
+
+  private saveUserDbAccessToLocalStorage(userId: number, list: DatabaseAccessComplex[]) {
+    try {
+      const raw = localStorage.getItem('users.dbAccess');
+      const parsed = raw ? (JSON.parse(raw) as Record<string, DatabaseAccessComplex[]>) : {};
+      parsed[String(userId)] = list;
+      localStorage.setItem('users.dbAccess', JSON.stringify(parsed));
+    } catch (e) {
+      console.error('saveUserDbAccessToLocalStorage failed', e);
     }
   }
 
@@ -179,6 +225,18 @@ export class UsersService {
               }
               // cache for further offline edits during this session and persist to localStorage
               this.saveFallbackToLocalStorage(list);
+              // If the UI supplied DatabaseAccess (UserEdit) persist that per-user so next edit shows saved checkboxes
+              try {
+                const dbAccessFromPayload = (payload as any)?.DatabaseAccess || (payload as any)?.User?.DatabaseAccess;
+                if (dbAccessFromPayload && maybeId != null) {
+                  // normalize to DatabaseAccessComplex[] if needed
+                  const toSave: DatabaseAccessComplex[] = (dbAccessFromPayload as any).map ? (dbAccessFromPayload as DatabaseAccessComplex[]) : [];
+                  this.saveUserDbAccessToLocalStorage(maybeId, toSave);
+                }
+              } catch (e) {
+                console.error('Saving per-user db access to localStorage failed', e);
+              }
+
               observer.next({ offlineSaved: true });
               observer.complete();
             } catch (e) {

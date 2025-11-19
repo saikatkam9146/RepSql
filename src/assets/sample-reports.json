@@ -1,0 +1,194 @@
+{
+  "Total": 9,
+  "Reports": [
+    {
+      "Report": {
+        "fnReportID": 575,
+        "fcReportName": "Test",
+        "fnConnectionID": 1,
+        "fcSQL": null,
+        "fnUserID": 95,
+        "fnUpdateExistingWorkbook": false,
+        "fdLastUpdate": "2025-07-10T09:11:28.357",
+        "fnLastEditUserID": 100,
+        "fdRunDate": "2025-07-12T00:01:35.883",
+        "fnStatusID": 0,
+        "fnRunTimeDurationSeconds": 0
+      },
+      "User": {
+        "fnUserID": 95,
+        "fcFirstName": "Da",
+        "fcLastName": "R",
+        "fcUserNT": "F",
+        "fcUserEmail": "Da.s@ens.com",
+        "fnDepartmentID": 2,
+        "fnAccessID": 3,
+        "fcApprovalStatus": "Approved",
+        "fcComments": null,
+        "fnRunConsolePermission": false,
+        "fbDeveloper": false,
+        "TimeZoneID": 5
+      },
+      "Department": {
+        "fnDepartmentID": 2,
+        "fcDepartmentName": "Ang"
+      },
+      "UserAccess": {
+        "fnAccessID": 3,
+        "fcAccessDescription": "Global Level"
+      },
+      "EmailReport": {
+        "fnReportID": 575,
+        "fnDisable": false,
+        "fcFrom": "NOY@ens.com",
+        "fcSubject": "Test - SDM",
+        "fcBody": "Hello, Test - SDM report is available at \\\\00001\\cheduler\\Dev\\Reports\\",
+        "fnSendSecure": false,
+        "fnAttachment": false,
+        "fcAttachmentName": "",
+        "fnZipFile": false,
+        "fcZipPassword": ""
+      },
+      "ReportHistory": null,
+      "ReportStatus": null,
+      "ExistingWorkbook": null,
+      "DatabaseConnection": {
+        "fnConnectionID": 1,
+        "fcConnectionName": "SeDM",
+        "fcConnectionType": "Sr",
+        "fcProvider": "St",
+        "fcDataSource": "db-",
+        "fcInitialCatalog": "Se",
+        "fcIntegratedSecurity": "TRUE",
+        "fcTrustedConnection": "TRUE",
+        "fnDatabaseActive": false,
+        "fdLastUpdate": "2025-11-10T19:10:44.043",
+        "fcSchema": "DBO",
+        "HasDatabaseEditAccess": false
+      },
+      "Adhoc": {
+        "fnReportID": 575,
+        "fdDateTime": "1900-01-01T00:00:00",
+        "fnStatusID": 0,
+        "fbRescheduled": true,
+        "IsDeleted": false
+      },
+      "Minute": null,
+      "Week": null,
+      "Month": null,
+      "Hour": null,
+      "Status": {
+        "fnStatusID": 0,
+        "fcStatusDescription": "Scheduled"
+      },
+      "Exports": null,
+      "Sheets": null,
+      "EmailLists": null,
+      "ReportQueue": null,
+      "ExportsToBeDeleted": null,
+      "SheetsToBeDeleted": null,
+      "EmailListsToBeDeleted": null,
+      "HasEditAccess": false
+    },
+    {
+      "Report": {
+        "fnReportID": 4582,
+        "fcReportName": "Report 80",
+        "fnConnectionID": 1045,
+        "fcSQL": null,
+        "fnUserID": 100,
+        "fnUpdateExistingWorkbook": false,
+        "fdLastUpdate": "2025-10-07T09:12:14.05",
+        "fnLastEditUserID": 100,
+        "fdRunDate": "2025-10-07T09:15:18.157",
+        "fnStatusID": 0,
+        "fnRunTimeDurationSeconds": 4
+      },
+      "User": {
+        "fnUserID": 100,
+        "fcFirstName": "Si Pp",
+        "fcLastName": "Katkam",
+        "fcUserNT": "NQ87",
+        "fcUserEmail": "kradeep@ze.com",
+        "fnDepartmentID": 2,
+        "fnAccessID": 4,
+        "fcApprovalStatus": "Approved",
+        "fcComments": "for testing",
+        "fnRunConsolePermission": false,
+        "fbDeveloper": false,
+        "TimeZoneID": 2
+      },
+      "Department": {
+        "fnDepartmentID": 2,
+        "fcDepartmentName": "Ang"
+      },
+      "UserAccess": {
+        "fnAccessID": 4,
+        "fcAccessDescription": "Administrator Level"
+      },
+      "EmailReport": {
+        "fnReportID": 4582,
+        "fnDisable": false,
+        "fcFrom": "NO@C.COM",
+        "fcSubject": "Sample report with leading ZEROS FIX",
+        "fcBody": "Hello, Rpt 80 Active Sagent Loans is available at \\\\0001\\ent\\RepShare\\",
+        "fnSendSecure": false,
+        "fnAttachment": false,
+        "fcAttachmentName": "",
+        "fnZipFile": false,
+        "fcZipPassword": ""
+      },
+      "ReportHistory": null,
+      "ReportStatus": null,
+      "ExistingWorkbook": null,
+      "DatabaseConnection": {
+        "fnConnectionID": 1045,
+        "fcConnectionName": "Na",
+        "fcConnectionType": "Nza",
+        "fcProvider": "NetezzaSQL",
+        "fcDataSource": "dbet",
+        "fcInitialCatalog": "SA",
+        "fcIntegratedSecurity": "580",
+        "fcTrustedConnection": null,
+        "fnDatabaseActive": true,
+        "fdLastUpdate": "2025-11-10T19:31:20.623",
+        "fcSchema": null,
+        "HasDatabaseEditAccess": false
+      },
+      "Adhoc": null,
+      "Minute": null,
+      "Week": null,
+      "Month": {
+        "fnReportID": 4582,
+        "fnDayOfMonth": 0,
+        "fnRecurrenceMonths": 1,
+        "fdLastRunDate": "2025-10-07T00:00:00",
+        "fnStatusID": 0,
+        "fnRunHour": 8,
+        "fnRunMinute": 0,
+        "fbRescheduled": false,
+        "fnOndays": "1",
+        "fnWeekDay": null,
+        "fnWeekNo": 0,
+        "fbCaptureMonthlySnapshot": false,
+        "fnRunOnEveryFirstDayOfMonth": false,
+        "IsDeleted": false
+      },
+      "Hour": null,
+      "Status": {
+        "fnStatusID": 0,
+        "fcStatusDescription": "Scheduled"
+      },
+      "Exports": null,
+      "Sheets": null,
+      "EmailLists": null,
+      "ReportQueue": null,
+      "ExportsToBeDeleted": null,
+      "SheetsToBeDeleted": null,
+      "EmailListsToBeDeleted": null,
+      "HasEditAccess": false
+    }
+  ],
+  "Departments": null,
+  "Users": null
+}

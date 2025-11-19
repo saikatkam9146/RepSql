@@ -1,0 +1,72 @@
+{
+  "Users": [
+    {
+      "fnUserID": 1,
+      "fcFirstName": "Triia",
+      "fcLastName": "Mden",
+      "fcUserNT": "tmcfadd2",
+      "fcUserEmail": "Tra.M@Fi.com",
+      "fnDepartmentID": 2,
+      "fnAccessID": 4,
+      "fcApprovalStatus": "Denied",
+      "fcComments": "Your permissions to scheduler have been updated.",
+      "fnRunConsolePermission": true,
+      "fbDeveloper": false,
+      "TimeZoneID": 3
+    },
+    {
+      "fnUserID": 100,
+      "fcFirstName": "Sai Prep",
+      "fcLastName": "Kaam",
+      "fcUserNT": "NQC87",
+      "fcUserEmail": "kaam.saiprep@its.com",
+      "fnDepartmentID": 2,
+      "fnAccessID": 4,
+      "fcApprovalStatus": "Approved",
+      "fcComments": "for testing",
+      "fnRunConsolePermission": false,
+      "fbDeveloper": false,
+      "TimeZoneID": 2
+    }
+  ],
+  "Departments": [
+    {
+      "fnDepartmentID": 1,
+      "fcDepartmentName": "Spng"
+    },
+    {
+      "fnDepartmentID": 12,
+      "fcDepartmentName": "Ines"
+    }
+  ],
+  "DatabaseConnection": [
+    {
+      "fnConnectionID": 1,
+      "fcConnectionName": "SeDM",
+      "fcConnectionType": "Srver",
+      "fcProvider": "Synt",
+      "fcDataSource": "db-SD",
+      "fcInitialCatalog": "SerM",
+      "fcIntegratedSecurity": "TRUE",
+      "fcTrustedConnection": "TRUE",
+      "fnDatabaseActive": false,
+      "fdLastUpdate": "2025-11-10T19:10:44.043",
+      "fcSchema": "DBO",
+      "HasDatabaseEditAccess": false
+    },
+    {
+      "fnConnectionID": 1045,
+      "fcConnectionName": "za",
+      "fcConnectionType": "Nezza",
+      "fcProvider": "NSQL",
+      "fcDataSource": "dt",
+      "fcInitialCatalog": "SA",
+      "fcIntegratedSecurity": "480",
+      "fcTrustedConnection": null,
+      "fnDatabaseActive": true,
+      "fdLastUpdate": "2025-11-10T19:31:20.623",
+      "fcSchema": null,
+      "HasDatabaseEditAccess": false
+    }
+  ]
+}

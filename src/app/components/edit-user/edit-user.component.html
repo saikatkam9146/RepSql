@@ -1,10 +1,17 @@
 <div class="edit-user-fullpage" *ngIf="userWrapper">
   <header class="page-header">
-    <h2>Edit User — {{ userWrapper.User.User.fcFirstName }} {{ userWrapper.User.User.fcLastName }}</h2>
+    <div class="title"> 
+      <h2>Edit User — {{ userWrapper.User.User.fcFirstName }} {{ userWrapper.User.User.fcLastName }}</h2>
+    </div>
+    <div class="actions">
+      <button type="button" class="save" (click)="saveUser()">Save</button>
+      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
+    </div>
   </header>
 
   <form (ngSubmit)="saveUser()" class="edit-user-form">
-    <!-- Top section: 30-35% height split vertically into two columns -->
+    <div class="form-body">
+    <!-- Top section: split vertically into two columns -->
     <section class="top-section">
       <div class="overview">
         <h3>Overview</h3>
@@ -12,14 +19,33 @@
         <div class="field"><label>Last Name</label><input type="text" [(ngModel)]="userWrapper.User.User.fcLastName" name="fcLastName" /></div>
         <div class="field"><label>Email</label><input type="email" [(ngModel)]="userWrapper.User.User.fcUserEmail" name="fcUserEmail" /></div>
         <div class="field"><label>Login (NT)</label><input type="text" [(ngModel)]="userWrapper.User.User.fcUserNT" name="fcUserNT" /></div>
-  <div class="field"><label>Time Zone</label><input type="text" [(ngModel)]="userWrapper.User.TimeZoneOffset!.TimeZoneName" name="TimeZoneName" /></div>
+        <div class="field"><label>Time Zone</label>
+          <select [(ngModel)]="userWrapper.User.User.TimeZoneID" name="TimeZoneID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.TimeZone || userWrapper.TimeZone.length===0">-- no timezones --</option>
+            <!-- If current value isn't present in the list, show it as the first selectable option so the select displays the current value -->
+            <option *ngIf="userWrapper.User.User.TimeZoneID && !hasTimeZone(userWrapper.User.User.TimeZoneID)" [ngValue]="userWrapper.User.User.TimeZoneID">{{ getTimeZoneName(userWrapper.User.User.TimeZoneID) || 'Current' }}</option>
+            <option *ngFor="let tz of userWrapper.TimeZone" [ngValue]="tz.TimeZoneID">{{ tz.TimeZoneName }}</option>
+          </select>
+        </div>
         <div class="field"><label>Comments</label><textarea [(ngModel)]="userWrapper.User.User.fcComments" name="fcComments"></textarea></div>
       </div>
 
       <aside class="authorization">
         <h3>Authorization</h3>
-        <div class="field"><label>Level</label><input type="text" [(ngModel)]="userWrapper.User.UserAccess!.fcAccessDescription" name="fcAccessDescription" /></div>
-        <div class="field"><label>Department</label><input type="text" [(ngModel)]="userWrapper.User.Department!.fcDepartmentName" name="fcDepartmentName" /></div>
+        <div class="field"><label>Level</label>
+          <select [(ngModel)]="userWrapper.User.User.fnAccessID" name="fnAccessID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.UserAccess || userWrapper.UserAccess.length===0">-- no access levels --</option>
+            <option *ngIf="userWrapper.User.User.fnAccessID && !hasAccess(userWrapper.User.User.fnAccessID)" [ngValue]="userWrapper.User.User.fnAccessID">{{ getAccessDescription(userWrapper.User.User.fnAccessID) || 'Current' }}</option>
+            <option *ngFor="let a of userWrapper.UserAccess" [ngValue]="a.fnAccessID">{{ a.fcAccessDescription }}</option>
+          </select>
+        </div>
+        <div class="field"><label>Department</label>
+          <select [(ngModel)]="userWrapper.User.User.fnDepartmentID" name="fnDepartmentID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.Departments || userWrapper.Departments.length===0">-- no departments --</option>
+            <option *ngIf="userWrapper.User.User.fnDepartmentID && !hasDepartment(userWrapper.User.User.fnDepartmentID)" [ngValue]="userWrapper.User.User.fnDepartmentID">{{ getDepartmentName(userWrapper.User.User.fnDepartmentID) || 'Current' }}</option>
+            <option *ngFor="let d of userWrapper.Departments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
+          </select>
+        </div>
         <div class="field"><label>Status</label>
           <select [(ngModel)]="userWrapper.User.User.fcApprovalStatus" name="fcApprovalStatus">
             <option value="Approved">Approved</option>
@@ -28,10 +54,10 @@
           </select>
         </div>
       </aside>
-    </section>
+  </section>
 
-    <!-- Bottom section: remaining 65-70% height with database access table -->
-    <section class="bottom-section">
+  <!-- Bottom section: remaining area with database access table -->
+  <section class="bottom-section">
       <h3>Database Access</h3>
       <div class="db-table">
         <div class="db-row db-header">
@@ -46,10 +72,6 @@
         </div>
       </div>
     </section>
-
-    <footer class="form-actions">
-      <button type="submit" class="save">Save</button>
-      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
-    </footer>
+    </div>
   </form>
 </div>
