@@ -8,7 +8,7 @@ export const routes: Routes = [
 	{ path: '', redirectTo: 'reports', pathMatch: 'full' },
 	{ path: 'reports', loadComponent: () => import('./components/reports/reports.component').then(m => m.ReportsComponent) },
 	{ path: 'reports/view/:id', loadComponent: () => import('./components/report-detail/report-detail.component').then(m => m.ReportDetailComponent) },
-	{ path: 'reports/create', loadComponent: () => import('./components/create-report/create-report.component').then(m => m.CreateReportComponent) },
+	{ path: 'reports/create', loadComponent: () => import('./components/report-detail/report-detail.component').then(m => m.ReportDetailComponent) },
 	{ path: 'databases', component: DatabasesComponent },
 	{ path: 'users', component: UsersComponent },
 	{ path: 'edit-user/:id', loadComponent: () => import('./components/edit-user/edit-user.component').then(m => m.EditUserComponent) },

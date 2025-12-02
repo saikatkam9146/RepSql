@@ -46,7 +46,11 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
               <td>{{ formatEmail(r) }}</td>
               <td>{{ r.Report.fdRunDate ? (r.Report.fdRunDate | date:'short') : '—' }}</td>
               <td>{{ r.Report.fnRunTimeDurationSeconds ? r.Report.fnRunTimeDurationSeconds + 's' : '—' }}</td>
-              <td><button (click)="viewReport(r.Report.fnReportID)" title="View">👁️</button></td>
+              <td class="row-actions">
+                <button title="Edit" (click)="editReport(r.Report.fnReportID)">✏️</button>
+                <button title="View" (click)="viewReport(r.Report.fnReportID)">👁️</button>
+                <button title="Reschedule" (click)="rescheduleReport(r.Report.fnReportID)">▶️</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -121,6 +125,7 @@ export class ReportsComponent implements OnInit {
   pageSizeOptions = [10, 25, 50];
   pageSize = 10;
   currentPage = 1;
+  currentQueryOptions: ReportQueryOptions = defaultReportQueryOptions();
 
   constructor(private reportsService: ReportsService, private router: Router) {}
 
@@ -139,6 +144,7 @@ export class ReportsComponent implements OnInit {
 
         // load saved queryOptions and apply pagination
         const options = this.loadQueryOptionsFromLocalStorage();
+        this.currentQueryOptions = options;
         this.pageSize = options.Take || this.pageSize;
         this.currentPage = Math.floor((options.Skip || 0) / this.pageSize) + 1;
         this.fetchReports(options);
@@ -205,6 +211,7 @@ export class ReportsComponent implements OnInit {
     q.Database = this.filters.Database ? String(this.filters.Database) : undefined;
     q.Server = this.filters.Server ? String(this.filters.Server) : undefined;
     q.SearchTerm = this.searchTerm || '';
+    this.currentQueryOptions = q;
     this.saveQueryOptionsToLocalStorage(q);
     this.fetchReports(q);
   }
@@ -229,6 +236,20 @@ export class ReportsComponent implements OnInit {
   goToPage(p: number) { if (p !== this.currentPage) { this.currentPage = p; this.onFilterChange(); } }
 
   createNew() { this.router.navigate(['/reports/create']); }
+
+  editReport(id: number) { this.router.navigate(['/reports/view', id], { queryParams: { mode: 'edit' } }); }
+
+  rescheduleReport(id: number) {
+    const report = this.reports.find(r => r.Report.fnReportID === id);
+    if (!report) return;
+    this.reportsService.rescheduleReport(report).subscribe(r => {
+      alert('Report rescheduled successfully.');
+      this.fetchReports(this.currentQueryOptions);
+    }, err => {
+      console.error('Reschedule failed', err);
+      alert('Reschedule failed. See console for details.');
+    });
+  }
 
   formatEmail(r: ReportComplex): string {
     const from = r.EmailReport?.fcFrom || '';

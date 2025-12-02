@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { ReportList, Setup } from '../models/reports.model';
+import { ReportList, Setup, CheckSQL, ActiveSuspendReport, ProcessReportQuery, ReportComplex, Export } from '../models/reports.model';
 import { ReportQueryOptions } from '../models/report-query-options.model';
 
 @Injectable({ providedIn: 'root' })
@@ -50,14 +50,30 @@ export class ReportsService {
     }));
   }
 
-  // Read a single report (POST or GET depending on API). Fallback reads the sample asset and returns matching entry.
-  getReport(id: number) {
-    const url = `${this.base}/getreport`;
-    // some APIs expect POST { id }
-    return this.http.post<any>(url, { id }, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+  // POST /api/report/GetReport (no params) returns ReportEdit object with initial setup data for creating
+  getReportSetup(): Observable<any> {
+    const url = `${this.base}/GetReport`;
+    return this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('getReportSetup failed, returning minimal defaults', err);
+      return of({
+        fnReportID: 0,
+        fcReportName: '',
+        fcSQL: '',
+        Exports: [],
+        EmailLists: [],
+        EmailReport: { fnDisable: false, fcFrom: '', fcSubject: '', fcBody: '' }
+      });
+    }));
+  }
+
+  // POST /api/report/GetReport(reportid, isAdmin) returns ReportEdit object for editing
+  getReport(reportid: number) {
+    const url = `${this.base}/GetReport`;
+    const body = { reportid, isAdmin: true };
+    return this.http.post<any>(url, body, this.jsonOptionsWithCredentials).pipe(catchError(err => {
       console.warn('getReport failed, falling back to asset', err);
       return this.http.get<ReportList>('/assets/sample-reports.json').pipe(map(list => {
-        const found = (list.Reports || []).find(r => r.Report?.fnReportID === id);
+        const found = (list.Reports || []).find(r => r.Report?.fnReportID === reportid);
         return found || null;
       }), catchError(e => {
         console.error('fallback sample-reports read failed', e);
@@ -93,6 +109,83 @@ export class ReportsService {
         console.error('createReport fallback failed', e);
         return of({ offlineSaved: false });
       }));
+    }));
+  }
+
+  // Save (update) a report. Posts a ReportComplex to /savereport.
+  // Falls back to localStorage if the backend is unavailable so dev flow can continue.
+  saveReport(payload: any) {
+    const url = `${this.base}/savereport`;
+    return this.http.post<any>(url, payload, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('saveReport failed, saving to localStorage fallback', err);
+      try {
+        const raw = localStorage.getItem('reports.fallback');
+        let list: ReportList;
+        if (raw) {
+          list = JSON.parse(raw) as ReportList;
+        } else {
+          list = { Total: 0, Reports: [], Departments: [], Users: [] } as ReportList;
+        }
+        list.Reports = list.Reports || [];
+        // try to find an existing entry by Report.fnReportID if present
+        const incoming = (payload && payload.Report) ? payload : payload;
+        const id = (incoming && incoming.Report && incoming.Report.fnReportID) || (incoming && incoming.fnReportID) || 0;
+        if (id && id > 0) {
+          const idx = list.Reports.findIndex(r => (((r as any).Report && (r as any).Report.fnReportID) === id) || ((r as any).fnReportID === id));
+          if (idx >= 0) {
+            list.Reports[idx] = payload;
+          } else {
+            list.Reports.unshift(payload);
+          }
+        } else {
+          list.Reports.unshift(payload);
+        }
+        localStorage.setItem('reports.fallback', JSON.stringify(list));
+        return of({ offlineSaved: true, saved: payload });
+      } catch (e) {
+        console.error('saveReport fallback failed', e);
+        return of({ offlineSaved: false });
+      }
+    }));
+  }
+
+  // POST /api/report/CheckSQLSyntax with CheckSQL payload (DatabaseConnectionID, SQL)
+  // Returns ProcessReportQuery with ProcessStatus and SQLErrorMsg
+  checkSQLSyntax(checkSQL: CheckSQL): Observable<ProcessReportQuery> {
+    const url = `${this.base}/CheckSQLSyntax`;
+    return this.http.post<ProcessReportQuery>(url, checkSQL, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('checkSQLSyntax failed', err);
+      return of({ ProcessStatus: 0, SQLErrorMsg: 'SQL validation unavailable (offline)' } as ProcessReportQuery);
+    }));
+  }
+
+  // POST /api/report/CheckValidPath with Export payload
+  // Returns boolean or status indicating if path is valid
+  checkValidPath(exportData: Export): Observable<any> {
+    const url = `${this.base}/CheckValidPath`;
+    return this.http.post<any>(url, exportData, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('checkValidPath failed', err);
+      return of({ IsValid: true, Message: 'Path validation unavailable (offline)' });
+    }));
+  }
+
+  // POST /api/report/RescheduleReport with ReportComplex
+  // Returns success/status response
+  rescheduleReport(report: ReportComplex): Observable<any> {
+    const url = `${this.base}/RescheduleReport`;
+    return this.http.post<any>(url, report, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('rescheduleReport failed', err);
+      return of({ Success: false, Message: 'Reschedule failed (offline)' });
+    }));
+  }
+
+  // POST /api/report/ActiveSuspendReport with ActiveSuspendReport payload (Report, SuspendFlag)
+  // Returns success/status response
+  activeSuspendReport(payload: ActiveSuspendReport): Observable<any> {
+    const url = `${this.base}/ActiveSuspendReport`;
+    return this.http.post<any>(url, payload, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.warn('activeSuspendReport failed', err);
+      return of({ Success: false, Message: 'Suspend/Resume failed (offline)' });
     }));
   }
 }

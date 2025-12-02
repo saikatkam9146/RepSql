@@ -268,3 +268,13 @@ export interface Setup {
   Departments: Department[];
   DatabaseConnection: DatabaseConnection[];
 }
+
+export interface CheckSQL {
+  DatabaseConnectionID: number;
+  SQL: string;
+}
+
+export interface ActiveSuspendReport {
+  Report: ReportComplex;
+  SuspendFlag: boolean;
+}
