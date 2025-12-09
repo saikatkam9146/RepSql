@@ -9,7 +9,7 @@ import { ReportsService } from '../../services/reports.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="report-edit" *ngIf="isLoaded; else loading">
+    <div class="report-edit" *ngIf="isLoaded; else loading" [class.view-mode]="readOnly">
       <div class="header">
         <h2 *ngIf="!readOnly">Edit Report #{{ report?.fnReportID }}</h2>
         <h2 *ngIf="readOnly">View Report #{{ report?.fnReportID }}</h2>
@@ -144,8 +144,11 @@ import { ReportsService } from '../../services/reports.service';
     .scheduling { max-width:35%; }
     .exports-table { width:100%; border-collapse:collapse; }
     .exports-table th, .exports-table td { border:1px solid #eee; padding:6px; }
-    textarea, input { width:100%; box-sizing:border-box; margin-bottom:0.5rem; }
+    textarea, input { width:100%; box-sizing:border-box; margin-bottom:0.5rem; border:1px solid #ccc; padding:6px; }
     .error-msg { color:#d32f2f; font-size:0.9rem; margin-top:-0.4rem; }
+    /* View mode: hide input/textarea borders and backgrounds for read-only appearance */
+    .view-mode textarea,
+    .view-mode input { border:none; background:transparent; padding:6px 0; }
     `
   ]
 })
@@ -166,16 +169,20 @@ export class ReportDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.id) {
+    // treat only positive numeric ids as "edit"; id==0 is a new/create report
+    console.log('[ReportDetail] ngOnInit - id from route:', this.id, 'type:', typeof this.id, 'readOnly:', this.readOnly);
+    if (this.id !== null && this.id !== undefined && Number(this.id) > 0) {
       // Edit mode: fetch existing report
+      console.log('[ReportDetail] Edit mode - calling getReport(reportid, isAdmin) with id:', this.id);
       this.reportsService.getReport(this.id).subscribe(r => {
         this.payload = r || null;
         if (this.payload) {
-          // ReportEdit object from API is the report itself, assign directly
-          this.report = this.payload;
+          // Normalize payload so template bindings work for both shapes
+          const normalized = this.normalizeReportPayload(this.payload);
+          this.report = normalized.report;
           // Extract nested lists if they exist in the response
-          this.fileExtensions = (this.payload as any).FileExtensions || [];
-          this.delimiters = (this.payload as any).Delimiters || [];
+          this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
+          this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
         }
@@ -183,12 +190,14 @@ export class ReportDetailComponent implements OnInit {
       }, err => { console.error(err); this.isLoaded = true; });
     } else {
       // Create mode: fetch initial setup data (ReportEdit with defaults)
+      console.log('[ReportDetail] Create mode - calling getReportSetup() (no params)');
       this.reportsService.getReportSetup().subscribe(r => {
         this.payload = r || null;
         if (this.payload) {
-          this.report = this.payload;
-          this.fileExtensions = (this.payload as any).FileExtensions || [];
-          this.delimiters = (this.payload as any).Delimiters || [];
+          const normalized = this.normalizeReportPayload(this.payload);
+          this.report = normalized.report;
+          this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
+          this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
           // Ensure ID is 0 for new report
@@ -329,6 +338,41 @@ export class ReportDetailComponent implements OnInit {
     if (!ex || !ex.Export) return;
     const val = ex.Export.fnDelimiterID;
     ex.Delimiter = this.delimiters.find(d => d.fnDelimiterID == val) || null;
+  }
+
+  // Normalize various API response shapes into a single object the template expects.
+  // Some endpoints return a ReportComplex (with nested .Report) while others return
+  // a flattened object. This helper returns an object with `report` (flattened)
+  // and optional lists (fileExtensions, delimiters) preserved.
+  private normalizeReportPayload(payload: any): { report: any; fileExtensions?: any[]; delimiters?: any[] } {
+    if (!payload) return { report: this.createEmptyReport() };
+
+    // If payload has a top-level Report property (ReportComplex / ReportEdit), flatten it
+    if (payload.Report) {
+      const base = { ...(payload.Report || {}) } as any;
+      // Copy commonly used linked objects onto the flattened object so bindings work
+      base.DatabaseConnection = payload.DatabaseConnection || payload.DatabaseConnectionExport || payload.DatabaseConnectionImport || payload.DatabaseConnection || payload.DatabaseConnection;
+      base.Department = payload.Department || payload.Department;
+      base.User = payload.User || payload.CurrentUser || null;
+      base.EmailReport = payload.EmailReport || payload.Report?.EmailReport || base.EmailReport || {};
+      base.Exports = payload.Exports || payload.ExportsToBeDeleted || base.Exports || [];
+      base.EmailLists = payload.EmailLists || base.EmailLists || [];
+      base.Month = payload.Month || base.Month || null;
+      base.Week = payload.Week || base.Week || null;
+      base.Hour = payload.Hour || base.Hour || null;
+      base.Minute = payload.Minute || base.Minute || null;
+      base.Logs = payload.Logs || base.Logs || [];
+
+      return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
+    }
+
+    // If payload already looks flattened (has fnReportID or fcReportName), use as-is
+    if (payload.fnReportID !== undefined || payload.fcReportName !== undefined) {
+      return { report: payload, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
+    }
+
+    // Fallback: return an empty report
+    return { report: this.createEmptyReport() };
   }
 
   sqlErrorMsg: string | null = null;

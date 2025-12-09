@@ -53,6 +53,7 @@ export class ReportsService {
   // POST /api/report/GetReport (no params) returns ReportEdit object with initial setup data for creating
   getReportSetup(): Observable<any> {
     const url = `${this.base}/GetReport`;
+    console.log('[ReportsService] getReportSetup() - POST', url, 'with empty body (no params)');
     return this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(catchError(err => {
       console.warn('getReportSetup failed, returning minimal defaults', err);
       return of({
@@ -70,6 +71,7 @@ export class ReportsService {
   getReport(reportid: number) {
     const url = `${this.base}/GetReport`;
     const body = { reportid, isAdmin: true };
+    console.log('[ReportsService] getReport() - POST', url, 'with body:', body);
     return this.http.post<any>(url, body, this.jsonOptionsWithCredentials).pipe(catchError(err => {
       console.warn('getReport failed, falling back to asset', err);
       return this.http.get<ReportList>('/assets/sample-reports.json').pipe(map(list => {

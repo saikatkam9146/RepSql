@@ -301,7 +301,8 @@ export class ReportsComponent implements OnInit {
   }
 
   viewReport(id: number) {
-    // navigate to a details page (minimal implementation exists)
-    this.router.navigate(['/reports/view', id]);
+    // navigate to the details page in read-only (view) mode; report-detail will
+    // call GetReport(reportid, isAdmin) when an id > 0 is present.
+    this.router.navigate(['/reports/view', id], { queryParams: { mode: 'view' } });
   }
 }
