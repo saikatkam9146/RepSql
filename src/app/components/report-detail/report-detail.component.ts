@@ -140,15 +140,21 @@ import { ReportsService } from '../../services/reports.service';
     .btn.primary { background:#2b6fbf; color:white; border:none; }
     .top-row { display:flex; gap:1rem; }
     .card { background:#fff; border:1px solid #ddd; padding:0.75rem; border-radius:4px; flex:1; }
+    .card > label { display: inline-block; width: 200px; font-weight: bold; vertical-align: top; margin-bottom: 0.5rem; }
+    .card > input,
+    .card > textarea,
+    .card > select { display: inline-block; width: calc(100% - 220px); margin-bottom: 0.5rem; border:1px solid #ccc; padding:6px; box-sizing:border-box; }
     .overview { max-width:60%; }
     .scheduling { max-width:35%; }
     .exports-table { width:100%; border-collapse:collapse; }
     .exports-table th, .exports-table td { border:1px solid #eee; padding:6px; }
-    textarea, input { width:100%; box-sizing:border-box; margin-bottom:0.5rem; border:1px solid #ccc; padding:6px; }
-    .error-msg { color:#d32f2f; font-size:0.9rem; margin-top:-0.4rem; }
+    .error-msg { color:#d32f2f; font-size:0.9rem; margin-top:-0.4rem; display:block; margin-left:220px; }
     /* View mode: hide input/textarea borders and backgrounds for read-only appearance */
     .view-mode textarea,
     .view-mode input { border:none; background:transparent; padding:6px 0; }
+    .card h3, .card h4 { margin-bottom: 0.5rem; }
+    .email-row { margin-bottom: 0.5rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; }
     `
   ]
 })

@@ -33,6 +33,7 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
               <th>Department</th>
               <th>Email</th>
               <th>Last</th>
+              <th>Status</th>
               <th>Duration</th>
               <th></th>
             </tr>
@@ -44,13 +45,14 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
               <td>{{ formatWhen(r) }}</td>
               <td>{{ r.User?.fcFirstName }} {{ r.User?.fcLastName }}</td>
               <td>{{ r.Department?.fcDepartmentName }}</td>
-              <td>{{ formatEmail(r) }}</td>
+              <td class="email-cell">{{ hasEmail(r) ? '✉️' : '' }}</td>
               <td>{{ r.Report.fdRunDate ? (r.Report.fdRunDate | date:'short') : '—' }}</td>
+              <td class="status-cell" [innerHTML]="getStatusSymbol(r)"></td>
               <td>{{ r.Report.fnRunTimeDurationSeconds ? r.Report.fnRunTimeDurationSeconds + 's' : '—' }}</td>
               <td class="row-actions">
-                <button title="Edit" (click)="editReport(r.Report.fnReportID)">✏️</button>
                 <button title="View" (click)="viewReport(r.Report.fnReportID)">👁️</button>
                 <button title="Reschedule" (click)="rescheduleReport(r.Report.fnReportID)">▶️</button>
+                <button title="Edit" (click)="editReport(r.Report.fnReportID)">✏️</button>
               </td>
             </tr>
           </tbody>
@@ -71,21 +73,21 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
               <option [ngValue]="null">All Status</option>
             </select>
             <select [(ngModel)]="filters.Type" (change)="onFilterChange()" class="filter-select">
-              <option [ngValue]="null" selected>-Type-</option>
+              <option [ngValue]="null">-Type-</option>
               <option [ngValue]="0">Monthly</option>
               <option [ngValue]="1">Weekly</option>
               <option [ngValue]="2">Hourly</option>
             </select>
             <select [(ngModel)]="filters.User" (change)="onFilterChange()" class="filter-select">
-              <option [ngValue]="null" selected>-User-</option>
+              <option [ngValue]="null">-User-</option>
               <option *ngFor="let u of setupUsers" [ngValue]="u.fnUserID">{{ u.fcFirstName }} {{ u.fcLastName }}</option>
             </select>
             <select [(ngModel)]="filters.Department" (change)="onFilterChange()" class="filter-select">
-              <option [ngValue]="null" selected>-Department-</option>
+              <option [ngValue]="null">-Department-</option>
               <option *ngFor="let d of setupDepartments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
             </select>
             <select [(ngModel)]="filters.Database" (change)="onFilterChange()" class="filter-select">
-              <option [ngValue]="null" selected>-Database-</option>
+              <option [ngValue]="null">-Database-</option>
               <option *ngFor="let db of setupDatabases" [ngValue]="db.fnConnectionID">{{ db.fcConnectionName }}</option>
             </select>
             <input placeholder="-Server-" [(ngModel)]="filters.Server" (change)="onFilterChange()" class="filter-input" />
@@ -113,6 +115,8 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
       .filters { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
       .filters select, .filters input { padding:0.35rem 0.5rem; border:1px solid #ccc; border-radius:4px; background:#fff; }
       .filters input { min-width:120px; }
+      .email-cell { text-align:center; font-size:1.2rem; }
+      .status-cell { text-align:center; font-size:1.2rem; }
     `
   ]
 })
@@ -122,7 +126,7 @@ export class ReportsComponent implements OnInit {
   isLoaded = false;
 
   // filters & UI state
-  filters: any = { Status: 0 }; // Default to Scheduled/In Process (status 0)
+  filters: any = { Status: 0, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to Scheduled/In Process (status 0)
   searchTerm = '';
   statusOptions = [ { id: 0, name: 'Scheduled/In Process' }, { id: 1, name: 'Stopped' }, { id: null, name: 'All' } ];
   typeOptions = [ { id: 0, name: 'Monthly' }, { id: 1, name: 'Weekly' }, { id: 2, name: 'Hourly' } ];
@@ -155,6 +159,16 @@ export class ReportsComponent implements OnInit {
         this.currentQueryOptions = options;
         this.pageSize = options.Take || this.pageSize;
         this.currentPage = Math.floor((options.Skip || 0) / this.pageSize) + 1;
+        
+        // Update filters object from loaded options
+        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : 0;
+        this.filters.Type = options.Type !== null && options.Type !== undefined ? options.Type : null;
+        this.filters.User = options.User !== null && options.User !== undefined ? options.User : null;
+        this.filters.Department = options.Department !== null && options.Department !== undefined ? options.Department : null;
+        this.filters.Database = options.Database || null;
+        this.filters.Server = options.Server || '';
+        this.searchTerm = options.SearchTerm || '';
+        
         this.fetchReports(options);
       }, err => { console.error(err); this.isLoaded = true; });
     }, err => { console.error(err); this.isLoaded = true; });
@@ -262,6 +276,21 @@ export class ReportsComponent implements OnInit {
   formatEmail(r: ReportComplex): string {
     const from = r.EmailReport?.fcFrom || '';
     return from.includes('@') ? from : '';
+  }
+
+  hasEmail(r: ReportComplex): boolean {
+    const from = r.EmailReport?.fcFrom || '';
+    return from.includes('@');
+  }
+
+  getStatusSymbol(r: ReportComplex): string {
+    // Status: Scheduled (0) = 📅 calendar, Error = ❌, Suspended = ⏸️, Completed = ✅
+    const status = r.Report.fnStatusID;
+    if (status === 0) return '📅'; // Scheduled/In Process
+    if (status === 2) return '❌'; // Error
+    if (status === 1) return '⏸️'; // Suspended/Stopped
+    if (status === 3) return '<span style="color:green;">✔️</span>'; // Completed
+    return '—';
   }
 
   formatWhen(r: ReportComplex): string {
