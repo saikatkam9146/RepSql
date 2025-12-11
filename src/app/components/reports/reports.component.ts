@@ -68,9 +68,9 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
           </div>
           <div class="filters">
             <select [(ngModel)]="filters.Status" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null">-Status-</option>
               <option [ngValue]="0">Scheduled/In Process</option>
               <option [ngValue]="1">Stopped</option>
-              <option [ngValue]="null">All Status</option>
             </select>
             <select [(ngModel)]="filters.Type" (change)="onFilterChange()" class="filter-select">
               <option [ngValue]="null">-Type-</option>
@@ -126,7 +126,7 @@ export class ReportsComponent implements OnInit {
   isLoaded = false;
 
   // filters & UI state
-  filters: any = { Status: 0, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to Scheduled/In Process (status 0)
+  filters: any = { Status: null, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to show all reports
   searchTerm = '';
   statusOptions = [ { id: 0, name: 'Scheduled/In Process' }, { id: 1, name: 'Stopped' }, { id: null, name: 'All' } ];
   typeOptions = [ { id: 0, name: 'Monthly' }, { id: 1, name: 'Weekly' }, { id: 2, name: 'Hourly' } ];
@@ -161,7 +161,7 @@ export class ReportsComponent implements OnInit {
         this.currentPage = Math.floor((options.Skip || 0) / this.pageSize) + 1;
         
         // Update filters object from loaded options
-        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : 0;
+        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : null;
         this.filters.Type = options.Type !== null && options.Type !== undefined ? options.Type : null;
         this.filters.User = options.User !== null && options.User !== undefined ? options.User : null;
         this.filters.Department = options.Department !== null && options.Department !== undefined ? options.Department : null;
