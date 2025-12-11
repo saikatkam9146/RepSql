@@ -39,36 +39,32 @@
         <td>{{ user.User.fcUserNT }}</td>
         <td>{{ user.TimeZoneOffset?.TimeZoneName }}</td>
         <td>
-          <button (click)="navigateToUserDetails(user, i)">Details</button>
-          <button (click)="navigateToEditUser(user, i)">Edit</button>
-          <button (click)="deleteUser(user.User.fnUserID)">Delete</button>
+          <button class="icon-btn" title="Edit user" (click)="navigateToEditUser(user, i)">✏️</button>
         </td>
       </tr>
     </tbody>
   </table>
 
   <div class="table-footer">
-    <div class="pagination-left">
-      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
-      <span>Page {{currentPage}} / {{ totalPages }}</span>
-      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+    <div class="pagination">
+      <button (click)="goToPage(1)" [disabled]="currentPage === 1" title="First page">&lt;&lt;</button>
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" title="Previous page">&lt;</button>
+      <button *ngFor="let p of pageNumbers" (click)="goToPage(p)" [class.active]="p === currentPage">{{ p }}</button>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" title="Next page">&gt;</button>
+      <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" title="Last page">&gt;&gt;</button>
     </div>
 
-    <div class="filters-right">
-      <label>Status:
-        <select [(ngModel)]="statusFilter" (change)="onFilterChange()">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="all">-- All --</option>
-        </select>
-      </label>
+    <div class="filters">
+      <select [(ngModel)]="statusFilter" (change)="onFilterChange()">
+        <option value="all">Status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
 
-      <label>Department:
-        <select [(ngModel)]="departmentFilter" (change)="onFilterChange()">
-          <option [ngValue]="'all'">-- All --</option>
-          <option *ngFor="let d of departments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
-        </select>
-      </label>
+      <select [(ngModel)]="departmentFilter" (change)="onFilterChange()">
+        <option [ngValue]="'all'">Department</option>
+        <option *ngFor="let d of departments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
+      </select>
     </div>
   </div>
 

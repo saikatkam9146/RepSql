@@ -1,9 +1,16 @@
 <div class="databases-container">
   <div class="databases-header">
     <h2>Databases</h2>
-    <button class="add-btn" (click)="openAddDatabase()" title="Add New Database">
-      <span class="plus-icon">&#43;</span>
-    </button>
+    <div class="header-right">
+      <select class="status-filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()" title="Filter by Status">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="all">-- All --</option>
+      </select>
+      <button class="add-btn" (click)="openAddDatabase()" title="Add New Database">
+        <span class="plus-icon">&#43;</span>
+      </button>
+    </div>
   </div>
   <div *ngIf="loading">Loading databases...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
@@ -33,27 +40,20 @@
         <td>{{ db.fnDatabaseActive ? 'Yes' : 'No' }}</td>
         <td>{{ db.fdLastUpdate | date:'short' }}</td>
         <td>
-          <button (click)="navigateToDatabaseDetails(db, i)">Details</button>
-          <button (click)="navigateToEditDatabase(db, i)">Edit</button>
+          <button class="icon-btn edit-btn" (click)="navigateToEditDatabase(db, i)" title="Edit Database">
+            <span class="pencil-icon">✎</span>
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
   <div class="table-footer">
-    <div class="pagination-left">
-      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
-      <span>Page {{currentPage}} / {{ totalPages }}</span>
-      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
-    </div>
-
-    <div class="filters-right">
-      <label>Status:
-        <select [(ngModel)]="statusFilter" (change)="onFilterChange()">
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="all">-- All --</option>
-        </select>
-      </label>
+    <div class="pagination">
+      <button (click)="goToPage(1)" [disabled]="currentPage === 1" title="First page">&lt;&lt;</button>
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1" title="Previous page">&lt;</button>
+      <button *ngFor="let p of pageNumbers" (click)="goToPage(p)" [class.active]="p === currentPage">{{ p }}</button>
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages" title="Next page">&gt;</button>
+      <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages" title="Last page">&gt;&gt;</button>
     </div>
   </div>
 

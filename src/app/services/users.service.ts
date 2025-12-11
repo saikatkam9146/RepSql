@@ -188,6 +188,15 @@ export class UsersService {
     }));
   }
 
+  // Preferred save endpoint: POST /api/user/SaveUser (creates or updates a UserEdit payload)
+  saveUser(payload: UserEdit): Observable<any> {
+    const url = `${this.base}/SaveUser`;
+    return this.http.post<any>(url, payload, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.error('saveUser failed', { message: err?.message, status: err?.status, url, error: err?.error });
+      return throwError(() => err);
+    }));
+  }
+
   updateUser(id: number, payload: UserEdit | UserComplex | UserItem): Observable<any> {
     const url = `${this.base}/update/${id}`;
     return this.http.put<any>(url, payload, this.jsonOptionsWithCredentials).pipe(catchError(err => {

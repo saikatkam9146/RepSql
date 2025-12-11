@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { NavbarComponent } from '../navbar.component';
+import { RouterModule, Router } from '@angular/router';
+import { DatabasesService } from '../../services/databases.service';
+import { DatabaseConnection } from '../../models/user.model';
 
 @Component({
   selector: 'app-edit-database',
@@ -11,11 +12,13 @@ import { NavbarComponent } from '../navbar.component';
   templateUrl: './edit-database.component.html',
   styleUrls: ['./edit-database.component.scss']
 })
-export class EditDatabaseComponent {
+export class EditDatabaseComponent implements OnInit {
   databaseId: number | null = null;
-  database: any = null;
+  database: DatabaseConnection | null = null;
 
-  constructor() {
+  constructor(private databasesService: DatabasesService, private router: Router) {}
+
+  ngOnInit() {
     // Simulate ActivatedRoute for demo; replace with ActivatedRoute in real app
     this.databaseId = 1272;
     this.database = {
@@ -29,23 +32,26 @@ export class EditDatabaseComponent {
       fcTrustedConnection: 'TRUE',
       fnDatabaseActive: true,
       fdLastUpdate: '2025-02-28T13:50:57.247',
-      fcSchema: null
-    };
+      fcSchema: ''
+    } as DatabaseConnection;
   }
 
-  saveDatabase() {
-    // Simulate API update by finding and updating database in static databases array
-    const idx = (window as any).CreateDatabaseComponent?.databases?.findIndex((d: any) => d.fnConnectionID === this.database.fnConnectionID);
-    if (idx !== undefined && idx !== -1) {
-      (window as any).CreateDatabaseComponent.databases[idx] = { ...this.database };
-      alert('Database updated!');
-    } else {
-      alert('Database not found!');
-    }
+  save() {
+    if (!this.database) return;
+    this.databasesService.saveDatabase(this.database).subscribe({
+      next: (result: string) => {
+        console.log('Database saved:', result);
+        alert('Database saved successfully!');
+        this.router.navigate(['/databases']);
+      },
+      error: (err) => {
+        console.error('Failed to save database:', err);
+        alert('Failed to save database. Please try again.');
+      }
+    });
   }
 
   cancel() {
-    // TODO: Replace with navigation logic
-    alert('Cancelled.');
+    this.router.navigate(['/databases']);
   }
 }

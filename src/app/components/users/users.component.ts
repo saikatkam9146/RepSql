@@ -98,6 +98,15 @@ export class UsersComponent implements OnInit {
     return this.filteredUsers.slice(start, start + this.pageSize);
   }
 
+  get pageNumbers(): number[] {
+    const pages: number[] = [];
+    const tp = this.totalPages;
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(tp, start + 4);
+    for (let p = start; p <= end; p++) pages.push(p);
+    return pages;
+  }
+
   goToPage(page: number) {
     if (page < 1) page = 1;
     if (page > this.totalPages) page = this.totalPages;

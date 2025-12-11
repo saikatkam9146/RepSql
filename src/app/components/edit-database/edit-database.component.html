@@ -1,41 +1,51 @@
-<div class="edit-database-container">
-  <h2>Edit Database</h2>
-  <!-- Form fields for editing database go here -->
-  <form #dbForm="ngForm" (ngSubmit)="saveDatabase()">
-    <div class="form-grid">
-      <div>
-        <label>Connection ID:</label>
-        <input type="number" [(ngModel)]="database.fnConnectionID" name="fnConnectionID" readonly />
-        <label>Connection Name:</label>
+<div class="edit-database-fullpage" *ngIf="database">
+  <header class="page-header">
+    <div class="title">
+      <h2>Edit Database #{{ database.fnConnectionID }}</h2>
+    </div>
+    <div class="actions">
+      <button type="button" class="save" (click)="save()">Save</button>
+      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </header>
+
+  <form class="edit-database-form">
+    <div class="form-box">
+      <div class="field">
+        <span class="label">Connection Name</span>
         <input type="text" [(ngModel)]="database.fcConnectionName" name="fcConnectionName" />
-        <label>Provider:</label>
+      </div>
+      <div class="field">
+        <span class="label">Connection Type</span>
+        <input type="text" [(ngModel)]="database.fcConnectionType" name="fcConnectionType" />
+      </div>
+      <div class="field">
+        <span class="label">Connection Provider</span>
         <input type="text" [(ngModel)]="database.fcProvider" name="fcProvider" />
-        <label>Initial Catalog:</label>
+      </div>
+      <div class="field">
+        <span class="label">Data Source</span>
+        <input type="text" [(ngModel)]="database.fcDataSource" name="fcDataSource" />
+      </div>
+      <div class="field">
+        <span class="label">Initial Catalog</span>
         <input type="text" [(ngModel)]="database.fcInitialCatalog" name="fcInitialCatalog" />
-        <label>Integrated Security:</label>
+      </div>
+      <div class="field">
+        <span class="label">Integrated Security</span>
         <input type="text" [(ngModel)]="database.fcIntegratedSecurity" name="fcIntegratedSecurity" />
-        <label>Active:</label>
+      </div>
+      <div class="field">
+        <span class="label">Trusted Connection</span>
+        <input type="text" [(ngModel)]="database.fcTrustedConnection" name="fcTrustedConnection" />
+      </div>
+      <div class="field">
+        <span class="label">Database Active</span>
         <select [(ngModel)]="database.fnDatabaseActive" name="fnDatabaseActive">
           <option [ngValue]="true">Yes</option>
           <option [ngValue]="false">No</option>
         </select>
       </div>
-      <div>
-        <label>Type:</label>
-        <input type="text" [(ngModel)]="database.fcConnectionType" name="fcConnectionType" />
-        <label>Data Source:</label>
-        <input type="text" [(ngModel)]="database.fcDataSource" name="fcDataSource" />
-        <label>Trusted Connection:</label>
-        <input type="text" [(ngModel)]="database.fcTrustedConnection" name="fcTrustedConnection" />
-        <label>Last Update:</label>
-        <input type="text" [(ngModel)]="database.fdLastUpdate" name="fdLastUpdate" />
-        <label>Schema:</label>
-        <input type="text" [(ngModel)]="database.fcSchema" name="fcSchema" />
-      </div>
-    </div>
-    <div class="form-actions">
-      <button type="submit">Save</button>
-      <button type="button" (click)="cancel()">Cancel</button>
     </div>
   </form>
 </div>

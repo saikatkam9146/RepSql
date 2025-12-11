@@ -1,39 +1,73 @@
-<!-- navbar removed to prevent double rendering -->
-
-<div class="create-user-container">
-  <h2>Create User</h2>
-  <form (ngSubmit)="saveUser()">
-    <div class="form-grid">
-      <div>
-        <label>First Name:</label>
-        <input type="text" [(ngModel)]="newUser.fcFirstName" name="fcFirstName" />
-        <label>User NT:</label>
-        <input type="text" [(ngModel)]="newUser.fcUserNT" name="fcUserNT" />
-        <label>Department ID:</label>
-        <input type="number" [(ngModel)]="newUser.fnDepartmentID" name="fnDepartmentID" />
-        <label>Status:</label>
-        <input type="text" [(ngModel)]="newUser.fcApprovalStatus" name="fcApprovalStatus" />
-        <label>Run Console Permission:</label>
-        <input type="checkbox" [(ngModel)]="newUser.fnRunConsolePermission" name="fnRunConsolePermission" />
-        <label>TimeZone ID:</label>
-        <input type="number" [(ngModel)]="newUser.TimeZoneID" name="TimeZoneID" />
-      </div>
-      <div>
-        <label>Last Name:</label>
-        <input type="text" [(ngModel)]="newUser.fcLastName" name="fcLastName" />
-        <label>Email:</label>
-        <input type="email" [(ngModel)]="newUser.fcUserEmail" name="fcUserEmail" />
-        <label>Access ID:</label>
-        <input type="number" [(ngModel)]="newUser.fnAccessID" name="fnAccessID" />
-        <label>Comments:</label>
-        <input type="text" [(ngModel)]="newUser.fcComments" name="fcComments" />
-        <label>Developer:</label>
-        <input type="checkbox" [(ngModel)]="newUser.fbDeveloper" name="fbDeveloper" />
-      </div>
+<div class="edit-user-fullpage" *ngIf="userWrapper">
+  <header class="page-header">
+    <div class="title"> 
+      <h2>Create User</h2>
     </div>
-    <div class="form-actions">
-      <button type="submit">Save</button>
-  <button type="button" (click)="cancel()">Cancel</button>
+    <div class="actions">
+      <button type="button" class="save" (click)="saveUser()">Save</button>
+      <button type="button" class="cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </header>
+
+  <form (ngSubmit)="saveUser()" class="edit-user-form">
+    <div class="form-body">
+    <!-- Top section: split vertically into two columns -->
+    <section class="top-section">
+      <div class="overview">
+        <h3>Overview</h3>
+        <div class="field"><label>First Name</label><input type="text" [(ngModel)]="userWrapper.User.User.fcFirstName" name="fcFirstName" /></div>
+        <div class="field"><label>Last Name</label><input type="text" [(ngModel)]="userWrapper.User.User.fcLastName" name="fcLastName" /></div>
+        <div class="field"><label>Email</label><input type="email" [(ngModel)]="userWrapper.User.User.fcUserEmail" name="fcUserEmail" /></div>
+        <div class="field"><label>Login (NT)</label><input type="text" [(ngModel)]="userWrapper.User.User.fcUserNT" name="fcUserNT" /></div>
+        <div class="field"><label>Time Zone</label>
+          <select [(ngModel)]="userWrapper.User.User.TimeZoneID" name="TimeZoneID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.TimeZone || userWrapper.TimeZone.length===0">-- no timezones --</option>
+            <option *ngFor="let tz of userWrapper.TimeZone" [ngValue]="tz.TimeZoneID">{{ tz.TimeZoneName }}</option>
+          </select>
+        </div>
+        <div class="field"><label>Comments</label><textarea [(ngModel)]="userWrapper.User.User.fcComments" name="fcComments"></textarea></div>
+      </div>
+
+      <aside class="authorization">
+        <h3>Authorization</h3>
+        <div class="field"><label>Level</label>
+          <select [(ngModel)]="userWrapper.User.User.fnAccessID" name="fnAccessID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.UserAccess || userWrapper.UserAccess.length===0">-- no access levels --</option>
+            <option *ngFor="let a of userWrapper.UserAccess" [ngValue]="a.fnAccessID">{{ a.fcAccessDescription }}</option>
+          </select>
+        </div>
+        <div class="field"><label>Department</label>
+          <select [(ngModel)]="userWrapper.User.User.fnDepartmentID" name="fnDepartmentID">
+            <option [ngValue]="null" disabled *ngIf="!userWrapper.Departments || userWrapper.Departments.length===0">-- no departments --</option>
+            <option *ngFor="let d of userWrapper.Departments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
+          </select>
+        </div>
+        <div class="field"><label>Status</label>
+          <select [(ngModel)]="userWrapper.User.User.fcApprovalStatus" name="fcApprovalStatus">
+            <option value="Approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+      </aside>
+  </section>
+
+  <!-- Bottom section: remaining area with database access table -->
+  <section class="bottom-section">
+      <h3>Database Access</h3>
+      <div class="db-table">
+        <div class="db-row db-header">
+          <div class="col name">Database Name</div>
+          <div class="col import">Import</div>
+          <div class="col export">Export</div>
+        </div>
+        <div class="db-row" *ngFor="let da of dbAccessList; let i = index">
+          <div class="col name">{{ da.DatabaseConnection?.fcConnectionName || ('DB ' + (da.DatabaseConnection?.fnConnectionID || i)) }}</div>
+          <div class="col import"><input type="checkbox" [(ngModel)]="da.DatabaseAccess!.fbImportAccess" name="import_{{i}}" /></div>
+          <div class="col export"><input type="checkbox" [(ngModel)]="da.DatabaseAccess!.fbExportAccess" name="export_{{i}}" /></div>
+        </div>
+      </div>
+    </section>
     </div>
   </form>
 </div>

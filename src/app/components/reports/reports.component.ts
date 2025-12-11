@@ -17,6 +17,7 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
           <div class="actions">
             <input class="search-box" placeholder="Search" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" />
             <button class="add-btn" title="Add new" (click)="createNew()">+</button>
+            <button class="refresh-btn" title="Refresh reports" (click)="refreshReports()">⟳</button>
           </div>
         </div>
 
@@ -55,41 +56,40 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
           </tbody>
         </table>
 
-        <div class="pagination" *ngIf="isLoaded && total > 0">
-          <label>Page size:
-            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-              <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+        <div class="table-footer" *ngIf="isLoaded && total > 0">
+          <div class="pagination">
+            <button (click)="goToPage(1)" [disabled]="currentPage<=1" title="First page">&lt;&lt;</button>
+            <button (click)="prevPage()" [disabled]="currentPage<=1" title="Previous page">&lt;</button>
+            <button *ngFor="let p of pageNumbers" (click)="goToPage(p)" [class.active]="p===currentPage">{{ p }}</button>
+            <button (click)="nextPage()" [disabled]="currentPage>=totalPages" title="Next page">&gt;</button>
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage>=totalPages" title="Last page">&gt;&gt;</button>
+          </div>
+          <div class="filters">
+            <select [(ngModel)]="filters.Status" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="0">Scheduled/In Process</option>
+              <option [ngValue]="1">Stopped</option>
+              <option [ngValue]="null">All Status</option>
             </select>
-          </label>
-          <button (click)="prevPage()" [disabled]="currentPage<=1">Previous</button>
-          <button *ngFor="let p of pageNumbers" (click)="goToPage(p)" [class.active]="p===currentPage">{{ p }}</button>
-          <button (click)="nextPage()" [disabled]="currentPage>=totalPages">Next</button>
-        </div>
-
-        <!-- Filters placed below the table as requested -->
-        <div class="filters" *ngIf="isLoaded">
-          <label>Filter by: </label>
-          <select [(ngModel)]="filters.Status" (change)="onFilterChange()">
-            <option value="">All Status</option>
-            <option *ngFor="let s of statusOptions" [value]="s.id">{{ s.name }}</option>
-          </select>
-          <select [(ngModel)]="filters.Type" (change)="onFilterChange()">
-            <option value="">All Type</option>
-            <option *ngFor="let t of typeOptions" [value]="t.id">{{ t.name }}</option>
-          </select>
-          <select [(ngModel)]="filters.User" (change)="onFilterChange()">
-            <option value="">All Users</option>
-            <option *ngFor="let u of setupUsers" [value]="u.fnUserID">{{ u.fcFirstName }} {{ u.fcLastName }}</option>
-          </select>
-          <select [(ngModel)]="filters.Department" (change)="onFilterChange()">
-            <option value="">All Departments</option>
-            <option *ngFor="let d of setupDepartments" [value]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
-          </select>
-          <select [(ngModel)]="filters.Database" (change)="onFilterChange()">
-            <option value="">All Databases</option>
-            <option *ngFor="let db of setupDatabases" [value]="db.fnConnectionID">{{ db.fcConnectionName }}</option>
-          </select>
-          <input placeholder="Server" [(ngModel)]="filters.Server" (change)="onFilterChange()" />
+            <select [(ngModel)]="filters.Type" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null" selected>-Type-</option>
+              <option [ngValue]="0">Monthly</option>
+              <option [ngValue]="1">Weekly</option>
+              <option [ngValue]="2">Hourly</option>
+            </select>
+            <select [(ngModel)]="filters.User" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null" selected>-User-</option>
+              <option *ngFor="let u of setupUsers" [ngValue]="u.fnUserID">{{ u.fcFirstName }} {{ u.fcLastName }}</option>
+            </select>
+            <select [(ngModel)]="filters.Department" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null" selected>-Department-</option>
+              <option *ngFor="let d of setupDepartments" [ngValue]="d.fnDepartmentID">{{ d.fcDepartmentName }}</option>
+            </select>
+            <select [(ngModel)]="filters.Database" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null" selected>-Database-</option>
+              <option *ngFor="let db of setupDatabases" [ngValue]="db.fnConnectionID">{{ db.fcConnectionName }}</option>
+            </select>
+            <input placeholder="-Server-" [(ngModel)]="filters.Server" (change)="onFilterChange()" class="filter-input" />
+          </div>
         </div>
       </div>
     `,
@@ -100,11 +100,19 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
       .actions { display:flex; gap:0.5rem; align-items:center; }
       .search-box { padding:6px 8px; border:1px solid #ccc; border-radius:4px; }
       .add-btn { background:#2b6fbf; color:#fff; border:none; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer }
+      .refresh-btn { background:#2b6fbf; color:#fff; border:none; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; transition:transform 0.3s; }
+      .refresh-btn:hover { transform:rotate(180deg); }
       .reports-table { width: 100%; border-collapse: collapse; }
       .reports-table th, .reports-table td { border: 1px solid #eee; padding: 8px; text-align: left; }
       .reports-table th { background: #2b6fbf; color: #fff; }
-      .filters { margin-top:1rem; display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
-      .pagination { margin-top:0.5rem; display:flex; gap:0.5rem; align-items:center; }
+      .table-footer { margin-top:0.75rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; }
+      .pagination { display:flex; gap:0.35rem; align-items:center; }
+      .pagination button { padding:0.3rem 0.6rem; border:1px solid #ccc; background:#fff; cursor:pointer; border-radius:3px; }
+      .pagination button:disabled { opacity:0.4; cursor:not-allowed; }
+      .pagination button.active { background:#2b6fbf; color:#fff; border-color:#2b6fbf; }
+      .filters { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+      .filters select, .filters input { padding:0.35rem 0.5rem; border:1px solid #ccc; border-radius:4px; background:#fff; }
+      .filters input { min-width:120px; }
     `
   ]
 })
@@ -114,9 +122,9 @@ export class ReportsComponent implements OnInit {
   isLoaded = false;
 
   // filters & UI state
-  filters: any = {};
+  filters: any = { Status: 0 }; // Default to Scheduled/In Process (status 0)
   searchTerm = '';
-  statusOptions = [ { id: 0, name: 'Scheduled' }, { id: 1, name: 'Stopped' } ];
+  statusOptions = [ { id: 0, name: 'Scheduled/In Process' }, { id: 1, name: 'Stopped' }, { id: null, name: 'All' } ];
   typeOptions = [ { id: 0, name: 'Monthly' }, { id: 1, name: 'Weekly' }, { id: 2, name: 'Hourly' } ];
   setupUsers: any[] = [];
   setupDepartments: any[] = [];
@@ -204,10 +212,10 @@ export class ReportsComponent implements OnInit {
     const q = defaultReportQueryOptions();
     q.Take = this.pageSize;
     q.Skip = (this.currentPage - 1) * this.pageSize;
-    q.Status = this.filters.Status ? Number(this.filters.Status) : null;
-    q.Type = this.filters.Type ? Number(this.filters.Type) : null;
-    q.User = this.filters.User ? Number(this.filters.User) : null;
-    q.Department = this.filters.Department ? Number(this.filters.Department) : null;
+    q.Status = this.filters.Status !== null && this.filters.Status !== undefined ? Number(this.filters.Status) : null;
+    q.Type = this.filters.Type !== null && this.filters.Type !== undefined ? Number(this.filters.Type) : null;
+    q.User = this.filters.User !== null && this.filters.User !== undefined ? Number(this.filters.User) : null;
+    q.Department = this.filters.Department !== null && this.filters.Department !== undefined ? Number(this.filters.Department) : null;
     q.Database = this.filters.Database ? String(this.filters.Database) : undefined;
     q.Server = this.filters.Server ? String(this.filters.Server) : undefined;
     q.SearchTerm = this.searchTerm || '';
@@ -304,5 +312,10 @@ export class ReportsComponent implements OnInit {
     // navigate to the details page in read-only (view) mode; report-detail will
     // call GetReport(reportid, isAdmin) when an id > 0 is present.
     this.router.navigate(['/reports/view', id], { queryParams: { mode: 'view' } });
+  }
+
+  refreshReports() {
+    // Reload reports using current query options
+    this.fetchReports(this.currentQueryOptions);
   }
 }

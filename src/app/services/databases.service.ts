@@ -24,4 +24,12 @@ export class DatabasesService {
       }));
     }));
   }
+
+  saveDatabase(dc: DatabaseConnection): Observable<string> {
+    const url = `${this.base}/savedatabase`;
+    return this.http.post<string>(url, dc, this.jsonOptionsWithCredentials).pipe(catchError(err => {
+      console.error('saveDatabase failed', { message: err?.message, status: err?.status, url, error: err?.error });
+      return throwError(() => err);
+    }));
+  }
 }
