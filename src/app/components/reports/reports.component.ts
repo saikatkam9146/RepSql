@@ -166,21 +166,24 @@ export class ReportsComponent implements OnInit {
         const servers = this.setupDatabases.map((db: any) => db.fcDataSource).filter((s: string) => s);
         this.setupServers = [...new Set(servers)]; // Remove duplicates
 
-        // load saved queryOptions and apply pagination
-        const options = this.loadQueryOptionsFromLocalStorage();
+        // Clear localStorage to start fresh on page reload
+        localStorage.removeItem('Status');
+        localStorage.removeItem('Type');
+        localStorage.removeItem('User');
+        localStorage.removeItem('Department');
+        localStorage.removeItem('Database');
+        localStorage.removeItem('Server');
+        localStorage.removeItem('SearchTerm');
+        localStorage.removeItem('Skip');
+
+        // Use default query options instead of loading from localStorage
+        const options = defaultReportQueryOptions();
+        options.Status = 8; // Default to ScheduledOrInProcess
         this.currentQueryOptions = options;
         this.pageSize = options.Take || this.pageSize;
-        this.currentPage = Math.floor((options.Skip || 0) / this.pageSize) + 1;
+        this.currentPage = 1; // Always start on page 1
         
-        // Update filters object from loaded options
-        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : 8;
-        this.filters.Type = options.Type !== null && options.Type !== undefined ? options.Type : null;
-        this.filters.User = options.User !== null && options.User !== undefined ? options.User : null;
-        this.filters.Department = options.Department !== null && options.Department !== undefined ? options.Department : null;
-        this.filters.Database = options.Database || null;
-        this.filters.Server = options.Server || null;
-        this.searchTerm = options.SearchTerm || '';
-        
+        // Filters already have default values from initialization
         this.fetchReports(options);
       }, err => { console.error(err); this.isLoaded = true; });
     }, err => { console.error(err); this.isLoaded = true; });
