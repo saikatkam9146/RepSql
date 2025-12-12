@@ -182,9 +182,22 @@ export class ReportsComponent implements OnInit {
     const q = defaultReportQueryOptions();
     try {
       const storedStatus = localStorage.getItem('Status');
-      q.Status = storedStatus == null ? 8 : (isNaN(Number(storedStatus)) ? 8 : Number(storedStatus));
+      const statusNum = storedStatus == null ? null : Number(storedStatus);
+      // Convert old status values (0, 1) to new default (8), or use stored value if valid
+      if (statusNum === 0 || statusNum === 1) {
+        q.Status = 8; // Convert old Scheduled/InProcess to ScheduledOrInProcess
+      } else {
+        q.Status = statusNum == null ? 8 : (isNaN(statusNum) ? 8 : statusNum);
+      }
+      
       const storedType = localStorage.getItem('Type');
-      q.Type = storedType == null ? null : (isNaN(Number(storedType)) ? null : Number(storedType));
+      const typeNum = storedType == null ? null : Number(storedType);
+      // Type 0 (None) is invalid, convert to null
+      if (typeNum === 0) {
+        q.Type = null;
+      } else {
+        q.Type = typeNum == null ? null : (isNaN(typeNum!) ? null : typeNum);
+      }
       q.TypeDayOfWeek = localStorage.getItem('TypeDayOfWeek') ? Number(localStorage.getItem('TypeDayOfWeek')) : null;
       q.TypeDayOfMonth = localStorage.getItem('TypeDayOfMonth') ? Number(localStorage.getItem('TypeDayOfMonth')) : null;
       q.User = localStorage.getItem('User') ? Number(localStorage.getItem('User')) : null;
