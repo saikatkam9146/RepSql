@@ -68,15 +68,19 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
           </div>
           <div class="filters">
             <select [(ngModel)]="filters.Status" (change)="onFilterChange()" class="filter-select">
-              <option [ngValue]="null">-Status-</option>
-              <option [ngValue]="0">Scheduled/In Process</option>
-              <option [ngValue]="1">Stopped</option>
+              <option [ngValue]="8">Scheduled/In Process</option>
+              <option [ngValue]="2">Completed</option>
+              <option [ngValue]="6">Suspended</option>
+              <option [ngValue]="7">Error</option>
+              <option [ngValue]="null">All Status</option>
             </select>
             <select [(ngModel)]="filters.Type" (change)="onFilterChange()" class="filter-select">
               <option [ngValue]="null">-Type-</option>
-              <option [ngValue]="0">Monthly</option>
-              <option [ngValue]="1">Weekly</option>
-              <option [ngValue]="2">Hourly</option>
+              <option [ngValue]="1">Adhoc</option>
+              <option [ngValue]="2">By Minute</option>
+              <option [ngValue]="3">Hourly</option>
+              <option [ngValue]="4">Weekly</option>
+              <option [ngValue]="5">Monthly</option>
             </select>
             <select [(ngModel)]="filters.User" (change)="onFilterChange()" class="filter-select">
               <option [ngValue]="null">-User-</option>
@@ -126,7 +130,7 @@ export class ReportsComponent implements OnInit {
   isLoaded = false;
 
   // filters & UI state
-  filters: any = { Status: null, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to show all reports
+  filters: any = { Status: 8, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to ScheduledOrInProcess (status 8)
   searchTerm = '';
   statusOptions = [ { id: 0, name: 'Scheduled/In Process' }, { id: 1, name: 'Stopped' }, { id: null, name: 'All' } ];
   typeOptions = [ { id: 0, name: 'Monthly' }, { id: 1, name: 'Weekly' }, { id: 2, name: 'Hourly' } ];
@@ -161,7 +165,7 @@ export class ReportsComponent implements OnInit {
         this.currentPage = Math.floor((options.Skip || 0) / this.pageSize) + 1;
         
         // Update filters object from loaded options
-        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : null;
+        this.filters.Status = options.Status !== null && options.Status !== undefined ? options.Status : 8;
         this.filters.Type = options.Type !== null && options.Type !== undefined ? options.Type : null;
         this.filters.User = options.User !== null && options.User !== undefined ? options.User : null;
         this.filters.Department = options.Department !== null && options.Department !== undefined ? options.Department : null;
@@ -178,7 +182,7 @@ export class ReportsComponent implements OnInit {
     const q = defaultReportQueryOptions();
     try {
       const storedStatus = localStorage.getItem('Status');
-      q.Status = storedStatus == null ? null : (isNaN(Number(storedStatus)) ? null : Number(storedStatus));
+      q.Status = storedStatus == null ? 8 : (isNaN(Number(storedStatus)) ? 8 : Number(storedStatus));
       const storedType = localStorage.getItem('Type');
       q.Type = storedType == null ? null : (isNaN(Number(storedType)) ? null : Number(storedType));
       q.TypeDayOfWeek = localStorage.getItem('TypeDayOfWeek') ? Number(localStorage.getItem('TypeDayOfWeek')) : null;
@@ -213,12 +217,15 @@ export class ReportsComponent implements OnInit {
   }
 
   private fetchReports(q: ReportQueryOptions) {
+    console.log('[ReportsComponent] fetchReports called with query:', JSON.stringify(q, null, 2));
     this.isLoaded = false;
     this.reportsService.getReports(q).subscribe(list => {
+      console.log('[ReportsComponent] getReports response:', list);
+      console.log('[ReportsComponent] Reports count:', list.Reports?.length || 0);
       this.reports = list.Reports || [];
       this.total = list.Total || this.reports.length;
       this.isLoaded = true;
-    }, err => { console.error(err); this.isLoaded = true; });
+    }, err => { console.error('[ReportsComponent] getReports error:', err); this.isLoaded = true; });
   }
 
   onFilterChange() {
@@ -284,12 +291,12 @@ export class ReportsComponent implements OnInit {
   }
 
   getStatusSymbol(r: ReportComplex): string {
-    // Status: Scheduled (0) = 📅 calendar, Error = ❌, Suspended = ⏸️, Completed = ✅
+    // Status: Scheduled (0) or InProcess (1) = 📅 calendar, Completed (2) = ✅, Suspended (6) = ⏸️, Error (3,4,5,7,23) = ❌
     const status = r.Report.fnStatusID;
-    if (status === 0) return '📅'; // Scheduled/In Process
-    if (status === 2) return '❌'; // Error
-    if (status === 1) return '⏸️'; // Suspended/Stopped
-    if (status === 3) return '<span style="color:green;">✔️</span>'; // Completed
+    if (status === 0 || status === 1) return '📅'; // Scheduled or InProcess
+    if (status === 2) return '<span style="color:green;">✔️</span>'; // Completed
+    if (status === 6) return '⏸️'; // Suspended
+    if (status === 3 || status === 4 || status === 5 || status === 7 || status === 23) return '❌'; // Any Error
     return '—';
   }
 
