@@ -94,7 +94,10 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
               <option [ngValue]="null">-Database-</option>
               <option *ngFor="let db of setupDatabases" [ngValue]="db.fnConnectionID">{{ db.fcConnectionName }}</option>
             </select>
-            <input placeholder="-Server-" [(ngModel)]="filters.Server" (change)="onFilterChange()" class="filter-input" />
+            <select [(ngModel)]="filters.Server" (change)="onFilterChange()" class="filter-select">
+              <option [ngValue]="null">-Server-</option>
+              <option *ngFor="let srv of setupServers" [ngValue]="srv">{{ srv }}</option>
+            </select>
           </div>
         </div>
       </div>
@@ -130,13 +133,14 @@ export class ReportsComponent implements OnInit {
   isLoaded = false;
 
   // filters & UI state
-  filters: any = { Status: 8, Type: null, User: null, Department: null, Database: null, Server: '' }; // Default to ScheduledOrInProcess (status 8)
+  filters: any = { Status: 8, Type: null, User: null, Department: null, Database: null, Server: null }; // Default to ScheduledOrInProcess (status 8)
   searchTerm = '';
   statusOptions = [ { id: 0, name: 'Scheduled/In Process' }, { id: 1, name: 'Stopped' }, { id: null, name: 'All' } ];
   typeOptions = [ { id: 0, name: 'Monthly' }, { id: 1, name: 'Weekly' }, { id: 2, name: 'Hourly' } ];
   setupUsers: any[] = [];
   setupDepartments: any[] = [];
   setupDatabases: any[] = [];
+  setupServers: any[] = [];
 
   pageSizeOptions = [10, 25, 50];
   pageSize = 10;
@@ -157,6 +161,10 @@ export class ReportsComponent implements OnInit {
         this.setupUsers = (setup && (setup as any).Users) || [];
         this.setupDepartments = (setup && (setup as any).Departments) || [];
         this.setupDatabases = (setup && (setup as any).DatabaseConnection) || [];
+        
+        // Extract unique servers from databases
+        const servers = this.setupDatabases.map((db: any) => db.fcDataSource).filter((s: string) => s);
+        this.setupServers = [...new Set(servers)]; // Remove duplicates
 
         // load saved queryOptions and apply pagination
         const options = this.loadQueryOptionsFromLocalStorage();
@@ -170,7 +178,7 @@ export class ReportsComponent implements OnInit {
         this.filters.User = options.User !== null && options.User !== undefined ? options.User : null;
         this.filters.Department = options.Department !== null && options.Department !== undefined ? options.Department : null;
         this.filters.Database = options.Database || null;
-        this.filters.Server = options.Server || '';
+        this.filters.Server = options.Server || null;
         this.searchTerm = options.SearchTerm || '';
         
         this.fetchReports(options);
@@ -253,7 +261,7 @@ export class ReportsComponent implements OnInit {
     q.User = this.filters.User !== null && this.filters.User !== undefined ? Number(this.filters.User) : null;
     q.Department = this.filters.Department !== null && this.filters.Department !== undefined ? Number(this.filters.Department) : null;
     q.Database = (this.filters.Database && this.filters.Database !== null) ? String(this.filters.Database) : undefined;
-    q.Server = (this.filters.Server && this.filters.Server !== '') ? String(this.filters.Server) : undefined;
+    q.Server = (this.filters.Server && this.filters.Server !== null && this.filters.Server !== '') ? String(this.filters.Server) : undefined;
     q.SearchTerm = this.searchTerm || '';
     this.currentQueryOptions = q;
     this.saveQueryOptionsToLocalStorage(q);
