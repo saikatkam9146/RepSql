@@ -58,8 +58,8 @@ import { defaultReportQueryOptions, ReportQueryOptions } from '../../models/repo
           </tbody>
         </table>
 
-        <div class="table-footer" *ngIf="isLoaded && total > 0">
-          <div class="pagination">
+        <div class="table-footer" *ngIf="isLoaded">
+          <div class="pagination" *ngIf="total > 0">
             <button (click)="goToPage(1)" [disabled]="currentPage<=1" title="First page">&lt;&lt;</button>
             <button (click)="prevPage()" [disabled]="currentPage<=1" title="Previous page">&lt;</button>
             <button *ngFor="let p of pageNumbers" (click)="goToPage(p)" [class.active]="p===currentPage">{{ p }}</button>
