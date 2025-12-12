@@ -39,7 +39,7 @@ export function defaultReportQueryOptions(): ReportQueryOptions {
     User: null,
     Department: null,
     SearchTerm: '',
-    Database: '',
-    Server: ''
+    Database: undefined,
+    Server: undefined
   };
 }

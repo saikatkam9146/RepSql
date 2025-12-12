@@ -263,7 +263,7 @@ export class ReportsComponent implements OnInit {
     q.Type = this.filters.Type !== null && this.filters.Type !== undefined ? Number(this.filters.Type) : null;
     q.User = this.filters.User !== null && this.filters.User !== undefined ? Number(this.filters.User) : null;
     q.Department = this.filters.Department !== null && this.filters.Department !== undefined ? Number(this.filters.Department) : null;
-    q.Database = (this.filters.Database && this.filters.Database !== null) ? String(this.filters.Database) : undefined;
+    q.Database = (this.filters.Database && this.filters.Database !== null && this.filters.Database !== '') ? String(this.filters.Database) : undefined;
     q.Server = (this.filters.Server && this.filters.Server !== null && this.filters.Server !== '') ? String(this.filters.Server) : undefined;
     q.SearchTerm = this.searchTerm || '';
     this.currentQueryOptions = q;
