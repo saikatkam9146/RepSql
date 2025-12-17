@@ -165,6 +165,21 @@ import { ReportsService } from '../../services/reports.service';
           <button class="small danger" (click)="removeEmail(j)" [disabled]="readOnly">Remove</button>
         </div>
       </div>
+
+      <div class="card logs" *ngIf="(report.Logs || []).length > 0">
+        <h3>Error Logs</h3>
+        <table class="logs-table">
+          <thead>
+            <tr><th>Date</th><th>Message</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of report.Logs">
+              <td>{{ log.fdDateTime | date:'short' }}</td>
+              <td>{{ log.fcMessage }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <ng-template #loading>
@@ -188,6 +203,9 @@ import { ReportsService } from '../../services/reports.service';
     .scheduling { max-width:35%; }
     .exports-table { width:100%; border-collapse:collapse; }
     .exports-table th, .exports-table td { border:1px solid #eee; padding:6px; }
+    .logs-table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .logs-table th, .logs-table td { border:1px solid #eee; padding:6px; text-align:left; }
+    .logs-table th { background:#f5f5f5; font-weight:bold; }
     .error-msg { color:#d32f2f; font-size:0.9rem; margin-top:-0.4rem; display:block; margin-left:220px; }
     /* View mode: hide input/textarea borders and backgrounds for read-only appearance */
     .view-mode textarea,
