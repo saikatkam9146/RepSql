@@ -357,9 +357,9 @@ export class ReportDetailComponent implements OnInit {
     if (payload.Report) {
       const base = { ...(payload.Report || {}) } as any;
       // Copy commonly used linked objects onto the flattened object so bindings work
-      base.DatabaseConnection = payload.DatabaseConnection || payload.DatabaseConnectionExport || payload.DatabaseConnectionImport || payload.DatabaseConnection || payload.DatabaseConnection;
-      base.Department = payload.Department || payload.Department;
-      base.User = payload.User || payload.CurrentUser || null;
+      base.DatabaseConnection = payload.DatabaseConnection || payload.DatabaseConnectionExport || payload.DatabaseConnectionImport || base.DatabaseConnection || base.DatabaseConnectionExport || base.DatabaseConnectionImport || null;
+      base.Department = payload.Department || base.Department || null;
+      base.User = payload.User || payload.CurrentUser || base.User || null;
       base.EmailReport = payload.EmailReport || payload.Report?.EmailReport || base.EmailReport || {};
       base.Exports = payload.Exports || payload.ExportsToBeDeleted || base.Exports || [];
       base.EmailLists = payload.EmailLists || base.EmailLists || [];
