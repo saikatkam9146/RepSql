@@ -51,11 +51,17 @@ import { ReportsService } from '../../services/reports.service';
 
           <!-- Ad Hoc Schedule -->
           <ng-container *ngIf="isAdhoc()">
-            <label>Date/Time</label>
-            <input type="datetime-local" 
-                   [value]="report.Adhoc?.fdDateTime | date:'yyyy-MM-ddTHH:mm'" 
-                   (change)="onAdhocDateTimeChange($event)"
-                   [disabled]="readOnly" />
+            <label>Date</label>
+            <input [value]="report.Adhoc?.fdDateTime | date:'MM/dd/yyyy'" readonly />
+
+            <label>Hour</label>
+            <input [value]="report.Adhoc?.fdDateTime | date:'hh'" readonly />
+
+            <label>Minute</label>
+            <input [value]="report.Adhoc?.fdDateTime | date:'mm'" readonly />
+
+            <label>AM/PM</label>
+            <input [value]="report.Adhoc?.fdDateTime | date:'a'" readonly />
           </ng-container>
 
           <!-- Monthly Schedule -->
