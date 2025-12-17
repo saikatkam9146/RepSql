@@ -170,12 +170,13 @@ import { ReportsService } from '../../services/reports.service';
         <h3>Error Logs</h3>
         <table class="logs-table">
           <thead>
-            <tr><th>Date</th><th>Message</th></tr>
+            <tr><th>Log ID</th><th>Timestamp</th><th>Error Message</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let log of report.Logs">
+              <td>{{ log.fnLogID }}</td>
               <td>{{ log.fdDateTime | date:'short' }}</td>
-              <td>{{ log.fcMessage }}</td>
+              <td>{{ log.fcErrorMessage }}</td>
             </tr>
           </tbody>
         </table>
