@@ -69,7 +69,7 @@ export class ReportsService {
 
   // POST /api/report/GetReport(id, isAdmin) returns ReportEdit object for editing
   getReport(reportid: number) {
-    const url = `${this.base}/GetReport?id=${reportid}&isAdmin=true`;
+    const url = `${this.base}/GetReport?id=${reportid}&isAdmin=1`;
     console.log('[ReportsService] getReport() - POST', url);
     return this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(catchError(err => {
       console.warn('getReport failed, falling back to asset', err);
