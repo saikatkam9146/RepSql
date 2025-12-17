@@ -49,17 +49,51 @@ import { ReportsService } from '../../services/reports.service';
           <label>Frequency</label>
           <input [value]="scheduleFrequency()" readonly />
 
-          <label>Date</label>
-          <input [value]="report.Month?.fdLastRunDate | date:'yyyy-MM-dd'" readonly />
+          <!-- Ad Hoc Schedule -->
+          <ng-container *ngIf="isAdhoc()">
+            <label>Date/Time</label>
+            <input type="datetime-local" 
+                   [value]="report.Adhoc?.fdDateTime | date:'yyyy-MM-ddTHH:mm'" 
+                   (change)="onAdhocDateTimeChange($event)"
+                   [disabled]="readOnly" />
+          </ng-container>
 
-          <label>Hour</label>
-          <input [value]="report.Month?.fnRunHour" readonly />
+          <!-- Monthly Schedule -->
+          <ng-container *ngIf="report.Month">
+            <label>Recurrence</label>
+            <input type="number" [(ngModel)]="report.Month.fnRecurrenceMonths" 
+                   [disabled]="readOnly" min="1" />
 
-          <label>Minute</label>
-          <input [value]="report.Month?.fnRunMinute" readonly />
+            <label>Hour (24h)</label>
+            <input type="number" [(ngModel)]="report.Month.fnRunHour" 
+                   [disabled]="readOnly" min="0" max="23" />
 
-          <label>AM/PM</label>
-          <input [value]="ampm()" readonly />
+            <label>Minute</label>
+            <input type="number" [(ngModel)]="report.Month.fnRunMinute" 
+                   [disabled]="readOnly" min="0" max="59" />
+          </ng-container>
+
+          <!-- Weekly Schedule -->
+          <ng-container *ngIf="report.Week && !report.Month">
+            <label>Hour (24h)</label>
+            <input type="number" [(ngModel)]="report.Week.fnRunHour" 
+                   [disabled]="readOnly" min="0" max="23" />
+
+            <label>Minute</label>
+            <input type="number" [(ngModel)]="report.Week.fnRunMinute" 
+                   [disabled]="readOnly" min="0" max="59" />
+          </ng-container>
+
+          <!-- Hourly Schedule -->
+          <ng-container *ngIf="report.Hour && !report.Month && !report.Week">
+            <label>Recurrence</label>
+            <input type="number" [(ngModel)]="report.Hour.fnRecurrenceHours" 
+                   [disabled]="readOnly" min="1" />
+
+            <label>Run Minute</label>
+            <input type="number" [(ngModel)]="report.Hour.fnRunMinute" 
+                   [disabled]="readOnly" min="0" max="59" />
+          </ng-container>
         </div>
       </div>
 
@@ -236,7 +270,8 @@ export class ReportDetailComponent implements OnInit {
       Week: null,
       Hour: null,
       Minute: null,
-      Adhoc: null
+      Adhoc: null,
+      Status: null
     } as any;
   }
 
@@ -282,17 +317,37 @@ export class ReportDetailComponent implements OnInit {
     if (!this.report) return '';
     if (this.report.Month) {
       const months = this.report.Month.fnRecurrenceMonths || 1;
-      return months <= 1 ? 'Ad Hoc' : `Every ${months} month(s)`;
+      return `Every ${months} month(s)`;
     }
     if (this.report.Week) return 'Weekly';
     if (this.report.Hour) return 'Hourly';
+    if (this.report.Minute) return 'By Minute';
     return 'Ad Hoc';
   }
 
-  ampm(): string {
-    if (!this.report || !this.report.Month) return '';
-    const h = this.report.Month.fnRunHour || 0;
-    return h >= 12 ? 'PM' : 'AM';
+  isAdhoc(): boolean {
+    return !this.report?.Month && !this.report?.Week && !this.report?.Hour && !this.report?.Minute;
+  }
+
+  getDisplayHour(hour24: number | undefined | null): string {
+    if (hour24 === undefined || hour24 === null) return '';
+    const h = hour24 % 12;
+    return h === 0 ? '12' : h.toString();
+  }
+
+  getAmPm(hour24: number | undefined | null): string {
+    if (hour24 === undefined || hour24 === null) return '';
+    return hour24 >= 12 ? 'PM' : 'AM';
+  }
+
+  onAdhocDateTimeChange(event: any) {
+    if (!this.report.Adhoc) {
+      this.report.Adhoc = {};
+    }
+    const value = event.target.value;
+    if (value) {
+      this.report.Adhoc.fdDateTime = new Date(value).toISOString();
+    }
   }
 
   // Exports CRUD
@@ -376,6 +431,7 @@ export class ReportDetailComponent implements OnInit {
       base.Week = payload.Week || (payload.Report as any).Week || base.Week || null;
       base.Hour = payload.Hour || (payload.Report as any).Hour || base.Hour || null;
       base.Minute = payload.Minute || (payload.Report as any).Minute || base.Minute || null;
+      base.Adhoc = payload.Adhoc || (payload.Report as any).Adhoc || base.Adhoc || null;
       base.Logs = payload.Logs || (payload.Report as any).Logs || base.Logs || [];
 
       return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
