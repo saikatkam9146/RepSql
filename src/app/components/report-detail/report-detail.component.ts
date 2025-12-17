@@ -355,19 +355,28 @@ export class ReportDetailComponent implements OnInit {
 
     // If payload has a top-level Report property (ReportComplex / ReportEdit), flatten it
     if (payload.Report) {
-      const base = { ...(payload.Report || {}) } as any;
+      // Some APIs return { Report: { ... } } and others nest again as { Report: { Report: {...} } }
+      const reportSource = (payload.Report as any).Report || payload.Report || {};
+      const base = { ...(reportSource || {}) } as any;
       // Copy commonly used linked objects onto the flattened object so bindings work
-      base.DatabaseConnection = payload.DatabaseConnection || payload.DatabaseConnectionExport || payload.DatabaseConnectionImport || base.DatabaseConnection || base.DatabaseConnectionExport || base.DatabaseConnectionImport || null;
-      base.Department = payload.Department || base.Department || null;
-      base.User = payload.User || payload.CurrentUser || base.User || null;
-      base.EmailReport = payload.EmailReport || payload.Report?.EmailReport || base.EmailReport || {};
-      base.Exports = payload.Exports || payload.ExportsToBeDeleted || base.Exports || [];
-      base.EmailLists = payload.EmailLists || base.EmailLists || [];
-      base.Month = payload.Month || base.Month || null;
-      base.Week = payload.Week || base.Week || null;
-      base.Hour = payload.Hour || base.Hour || null;
-      base.Minute = payload.Minute || base.Minute || null;
-      base.Logs = payload.Logs || base.Logs || [];
+      base.DatabaseConnection = payload.DatabaseConnection
+        || payload.DatabaseConnectionExport
+        || payload.DatabaseConnectionImport
+        || (payload.Report as any).DatabaseConnection
+        || base.DatabaseConnection
+        || base.DatabaseConnectionExport
+        || base.DatabaseConnectionImport
+        || null;
+      base.Department = payload.Department || (payload.Report as any).Department || base.Department || null;
+      base.User = payload.User || payload.CurrentUser || (payload.Report as any).User || base.User || null;
+      base.EmailReport = payload.EmailReport || (payload.Report as any).EmailReport || base.EmailReport || {};
+      base.Exports = payload.Exports || payload.ExportsToBeDeleted || (payload.Report as any).Exports || base.Exports || [];
+      base.EmailLists = payload.EmailLists || (payload.Report as any).EmailLists || base.EmailLists || [];
+      base.Month = payload.Month || (payload.Report as any).Month || base.Month || null;
+      base.Week = payload.Week || (payload.Report as any).Week || base.Week || null;
+      base.Hour = payload.Hour || (payload.Report as any).Hour || base.Hour || null;
+      base.Minute = payload.Minute || (payload.Report as any).Minute || base.Minute || null;
+      base.Logs = payload.Logs || (payload.Report as any).Logs || base.Logs || [];
 
       return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
     }
