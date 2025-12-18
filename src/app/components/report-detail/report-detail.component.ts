@@ -422,8 +422,8 @@ import { ReportsService } from '../../services/reports.service';
     .weekdays-grid label { display:flex; align-items:center; gap:0.5rem; width:auto; font-weight:normal; }
     .weekdays-grid input[type="checkbox"] { margin:0; }
     select { cursor: pointer; }
-    .overview { max-width:60%; }
-    .scheduling { max-width:35%; }
+    .overview { flex:1; }
+    .scheduling { flex:1; }
     .workbook { margin:1rem 0; }
     .exports-table { width:100%; border-collapse:collapse; margin-top:1rem; }
     .exports-table th, .exports-table td { border:1px solid #eee; padding:8px; text-align:left; }
