@@ -28,16 +28,40 @@ import { ReportsService } from '../../services/reports.service';
           <input [(ngModel)]="report.fcReportName" [disabled]="readOnly" />
 
           <label>Database</label>
-          <input [value]="report.DatabaseConnection?.fcConnectionName || ''" readonly />
+          <ng-container *ngIf="!readOnly">
+            <select [(ngModel)]="report.fnConnectionID" (change)="onDatabaseChange()" [disabled]="readOnly">
+              <option value="">-- Select Database --</option>
+              <option *ngFor="let db of databases" [value]="db.fnDatabaseConnectionID">{{ db.fcConnectionName }}</option>
+            </select>
+          </ng-container>
+          <ng-container *ngIf="readOnly">
+            <input [value]="report.DatabaseConnection?.fcConnectionName || ''" readonly />
+          </ng-container>
 
           <label>Server</label>
           <input [value]="report.DatabaseConnection?.fcDataSource || ''" readonly />
 
           <label>Department</label>
-          <input [value]="report.Department?.fcDepartmentName || ''" readonly />
+          <ng-container *ngIf="!readOnly">
+            <select [(ngModel)]="report.fnDepartmentID" [disabled]="readOnly">
+              <option value="">-- Select Department --</option>
+              <option *ngFor="let dept of departments" [value]="dept.fnDepartmentID">{{ dept.fcDepartmentName }}</option>
+            </select>
+          </ng-container>
+          <ng-container *ngIf="readOnly">
+            <input [value]="report.Department?.fcDepartmentName || ''" readonly />
+          </ng-container>
 
           <label>User</label>
-          <input [value]="report.User ? (report.User.fcFirstName + ' ' + report.User.fcLastName) : ''" readonly />
+          <ng-container *ngIf="!readOnly">
+            <select [(ngModel)]="report.fnUserID" [disabled]="readOnly">
+              <option value="">-- Select User --</option>
+              <option *ngFor="let user of users" [value]="user.fnUserID">{{ user.fcFirstName }} {{ user.fcLastName }}</option>
+            </select>
+          </ng-container>
+          <ng-container *ngIf="readOnly">
+            <input [value]="report.User ? (report.User.fcFirstName + ' ' + report.User.fcLastName) : ''" readonly />
+          </ng-container>
 
           <label>SQL</label>
           <textarea rows="6" [(ngModel)]="report.fcSQL" [disabled]="readOnly" (blur)="onSQLBlur()"></textarea>
@@ -47,58 +71,79 @@ import { ReportsService } from '../../services/reports.service';
         <div class="card scheduling">
           <h3>Scheduling</h3>
           <label>Frequency</label>
-          <input [value]="scheduleFrequency()" readonly />
+          <select [(ngModel)]="report.scheduleType" (change)="onFrequencyChange()" [disabled]="readOnly">
+            <option *ngFor="let freq of frequencyOptions" [value]="freq">{{ freq }}</option>
+          </select>
 
           <!-- Ad Hoc Schedule -->
-          <ng-container *ngIf="isAdhoc()">
+          <ng-container *ngIf="report.scheduleType === 'Ad Hoc'">
             <label>Date</label>
-            <input [value]="report.Adhoc?.fdDateTime | date:'MM/dd/yyyy'" readonly />
+            <input type="date" [(ngModel)]="report.adhocDate" [disabled]="readOnly" />
 
             <label>Hour</label>
-            <input [value]="report.Adhoc?.fdDateTime | date:'hh'" readonly />
+            <select [(ngModel)]="report.adhocHour" [disabled]="readOnly">
+              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
+            </select>
 
             <label>Minute</label>
-            <input [value]="report.Adhoc?.fdDateTime | date:'mm'" readonly />
+            <select [(ngModel)]="report.adhocMinute" [disabled]="readOnly">
+              <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
+            </select>
 
             <label>AM/PM</label>
-            <input [value]="report.Adhoc?.fdDateTime | date:'a'" readonly />
+            <select [(ngModel)]="report.adhocAmPm" [disabled]="readOnly">
+              <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+            </select>
           </ng-container>
 
           <!-- Monthly Schedule -->
-          <ng-container *ngIf="report.Month">
-            <label>Recurrence</label>
+          <ng-container *ngIf="report.scheduleType === 'Monthly'">
+            <label>Recurrence (months)</label>
             <input type="number" [(ngModel)]="report.Month.fnRecurrenceMonths" 
                    [disabled]="readOnly" min="1" />
 
             <label>Hour (24h)</label>
-            <input type="number" [(ngModel)]="report.Month.fnRunHour" 
-                   [disabled]="readOnly" min="0" max="23" />
+            <select [(ngModel)]="report.Month.fnRunHour" [disabled]="readOnly">
+              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
+            </select>
 
             <label>Minute</label>
-            <input type="number" [(ngModel)]="report.Month.fnRunMinute" 
-                   [disabled]="readOnly" min="0" max="59" />
+            <select [(ngModel)]="report.Month.fnRunMinute" [disabled]="readOnly">
+              <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
+            </select>
           </ng-container>
 
           <!-- Weekly Schedule -->
-          <ng-container *ngIf="report.Week && !report.Month">
+          <ng-container *ngIf="report.scheduleType === 'Weekly'">
             <label>Hour (24h)</label>
-            <input type="number" [(ngModel)]="report.Week.fnRunHour" 
-                   [disabled]="readOnly" min="0" max="23" />
+            <select [(ngModel)]="report.Week.fnRunHour" [disabled]="readOnly">
+              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
+            </select>
 
             <label>Minute</label>
-            <input type="number" [(ngModel)]="report.Week.fnRunMinute" 
-                   [disabled]="readOnly" min="0" max="59" />
+            <select [(ngModel)]="report.Week.fnRunMinute" [disabled]="readOnly">
+              <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
+            </select>
           </ng-container>
 
           <!-- Hourly Schedule -->
-          <ng-container *ngIf="report.Hour && !report.Month && !report.Week">
-            <label>Recurrence</label>
-            <input type="number" [(ngModel)]="report.Hour.fnRecurrenceHours" 
-                   [disabled]="readOnly" min="1" />
+          <ng-container *ngIf="report.scheduleType === 'Hourly'">
+            <label>Recurrence (hours)</label>
+            <select [(ngModel)]="report.Hour.fnRecurrenceHours" [disabled]="readOnly">
+              <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+            </select>
 
             <label>Run Minute</label>
-            <input type="number" [(ngModel)]="report.Hour.fnRunMinute" 
-                   [disabled]="readOnly" min="0" max="59" />
+            <select [(ngModel)]="report.Hour.fnRunMinute" [disabled]="readOnly">
+              <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
+            </select>
+          </ng-container>
+
+          <!-- By Minute Schedule -->
+          <ng-container *ngIf="report.scheduleType === 'By Minute'">
+            <label>Recurrence (minutes)</label>
+            <input type="number" [(ngModel)]="report.Minute.fnRecurrenceMinutes" 
+                   [disabled]="readOnly" min="1" />
           </ng-container>
         </div>
       </div>
@@ -200,6 +245,7 @@ import { ReportsService } from '../../services/reports.service';
     .card > input,
     .card > textarea,
     .card > select { display: inline-block; width: calc(100% - 220px); margin-bottom: 0.5rem; border:1px solid #ccc; padding:6px; box-sizing:border-box; }
+    select { cursor: pointer; }
     .overview { max-width:60%; }
     .scheduling { max-width:35%; }
     .exports-table { width:100%; border-collapse:collapse; }
@@ -223,8 +269,19 @@ export class ReportDetailComponent implements OnInit {
   payload: any = null;
   fileExtensions: any[] = [];
   delimiters: any[] = [];
+  databases: any[] = [];
+  users: any[] = [];
+  departments: any[] = [];
+  servers: any[] = [];
   isLoaded = false;
   readOnly = false;
+
+  // Scheduling dropdowns
+  frequencyOptions = ['Ad Hoc', 'Monthly', 'Weekly', 'Hourly', 'By Minute'];
+  hourOptions = Array.from({ length: 24 }, (_, i) => i); // 0-23
+  hourlyRecurrenceOptions = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
+  minuteOptions = Array.from({ length: 60 }, (_, i) => i); // 0-59
+  ampmOptions = ['AM', 'PM'];
 
   constructor(private route: ActivatedRoute, private router: Router, private reportsService: ReportsService) {
     const idStr = this.route.snapshot.paramMap.get('id');
@@ -251,8 +308,12 @@ export class ReportDetailComponent implements OnInit {
           // Extract nested lists if they exist in the response
           this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
           this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
+          this.databases = (this.payload as any).Databases || [];
+          this.users = (this.payload as any).Users || [];
+          this.departments = (this.payload as any).Departments || [];
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
+          this.initializeScheduleType();
         }
         this.isLoaded = true;
       }, err => { console.error(err); this.isLoaded = true; });
@@ -266,10 +327,14 @@ export class ReportDetailComponent implements OnInit {
           this.report = normalized.report;
           this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
           this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
+          this.databases = (this.payload as any).Databases || [];
+          this.users = (this.payload as any).Users || [];
+          this.departments = (this.payload as any).Departments || [];
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
           // Ensure ID is 0 for new report
           this.report.fnReportID = 0;
+          this.initializeScheduleType();
         } else {
           // fallback if API fails
           this.report = this.createEmptyReport();
@@ -283,11 +348,31 @@ export class ReportDetailComponent implements OnInit {
     }
   }
 
+  initializeScheduleType() {
+    if (!this.report) return;
+    if (this.report.Adhoc) {
+      this.report.scheduleType = 'Ad Hoc';
+    } else if (this.report.Month) {
+      this.report.scheduleType = 'Monthly';
+    } else if (this.report.Week) {
+      this.report.scheduleType = 'Weekly';
+    } else if (this.report.Hour) {
+      this.report.scheduleType = 'Hourly';
+    } else if (this.report.Minute) {
+      this.report.scheduleType = 'By Minute';
+    } else {
+      this.report.scheduleType = 'Ad Hoc';
+    }
+  }
+
   createEmptyReport() {
     return {
       fnReportID: 0,
       fcReportName: '',
       fcSQL: '',
+      fnConnectionID: null,
+      fnDepartmentID: null,
+      fnUserID: null,
       Exports: [],
       EmailLists: [],
       EmailReport: { fnDisable: false, fcFrom: '', fcSubject: '', fcBody: '' },
@@ -299,7 +384,12 @@ export class ReportDetailComponent implements OnInit {
       Hour: null,
       Minute: null,
       Adhoc: null,
-      Status: null
+      Status: null,
+      scheduleType: 'Ad Hoc',
+      adhocDate: new Date().toISOString().split('T')[0],
+      adhocHour: 0,
+      adhocMinute: 0,
+      adhocAmPm: 'AM'
     } as any;
   }
 
@@ -355,6 +445,47 @@ export class ReportDetailComponent implements OnInit {
 
   isAdhoc(): boolean {
     return !this.report?.Month && !this.report?.Week && !this.report?.Hour && !this.report?.Minute;
+  }
+
+  onDatabaseChange() {
+    if (!this.report?.fnConnectionID) return;
+    const db = this.databases.find(d => d.fnDatabaseConnectionID === this.report.fnConnectionID);
+    if (db) {
+      this.report.DatabaseConnection = db;
+    }
+  }
+
+  onFrequencyChange() {
+    if (!this.report.scheduleType) return;
+    
+    // Clear all schedule types
+    this.report.Month = null;
+    this.report.Week = null;
+    this.report.Hour = null;
+    this.report.Minute = null;
+    this.report.Adhoc = null;
+
+    switch (this.report.scheduleType) {
+      case 'Monthly':
+        this.report.Month = { fnRecurrenceMonths: 1, fnRunHour: 0, fnRunMinute: 0 };
+        break;
+      case 'Weekly':
+        this.report.Week = { fnRunHour: 0, fnRunMinute: 0 };
+        break;
+      case 'Hourly':
+        this.report.Hour = { fnRecurrenceHours: 1, fnRunMinute: 0 };
+        break;
+      case 'By Minute':
+        this.report.Minute = { fnRecurrenceMinutes: 1 };
+        break;
+      case 'Ad Hoc':
+      default:
+        this.report.Adhoc = { fdDateTime: new Date().toISOString() };
+        this.report.adhocDate = new Date().toISOString().split('T')[0];
+        this.report.adhocHour = new Date().getHours();
+        this.report.adhocMinute = new Date().getMinutes();
+        this.report.adhocAmPm = this.report.adhocHour >= 12 ? 'PM' : 'AM';
+    }
   }
 
   getDisplayHour(hour24: number | undefined | null): string {
