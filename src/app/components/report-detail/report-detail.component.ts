@@ -241,10 +241,13 @@ export class ReportDetailComponent implements OnInit {
       console.log('[ReportDetail] Edit mode - calling getReport(reportid, isAdmin) with id:', this.id);
       this.reportsService.getReport(this.id).subscribe(r => {
         this.payload = r || null;
+        console.log('[ReportDetail] getReport response:', this.payload);
         if (this.payload) {
           // Normalize payload so template bindings work for both shapes
           const normalized = this.normalizeReportPayload(this.payload);
           this.report = normalized.report;
+          console.log('[ReportDetail] Normalized report:', this.report);
+          console.log('[ReportDetail] Report Logs:', this.report.Logs);
           // Extract nested lists if they exist in the response
           this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
           this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
@@ -457,13 +460,16 @@ export class ReportDetailComponent implements OnInit {
       base.Hour = payload.Hour || (payload.Report as any).Hour || base.Hour || null;
       base.Minute = payload.Minute || (payload.Report as any).Minute || base.Minute || null;
       base.Adhoc = payload.Adhoc || (payload.Report as any).Adhoc || base.Adhoc || null;
-      base.Logs = payload.Logs || (payload.Report as any).Logs || base.Logs || [];
+      base.Logs = payload.Logs || payload.ErrorLogs || (payload.Report as any).Logs || (payload.Report as any).ErrorLogs || base.Logs || [];
+      console.log('[normalizeReportPayload] Extracted Logs:', base.Logs);
 
       return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
     }
 
     // If payload already looks flattened (has fnReportID or fcReportName), use as-is
     if (payload.fnReportID !== undefined || payload.fcReportName !== undefined) {
+      payload.Logs = payload.Logs || payload.ErrorLogs || [];
+      console.log('[normalizeReportPayload] Flattened Logs:', payload.Logs);
       return { report: payload, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
     }
 
