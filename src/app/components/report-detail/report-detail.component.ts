@@ -456,6 +456,16 @@ export class ReportDetailComponent implements OnInit {
     });
   }
 
+  cancel() {
+    this.router.navigate(['/reports']);
+  }
+
+  enterEditMode() {
+    this.readOnly = false;
+    // update URL to reflect edit mode
+    this.router.navigate([], { relativeTo: this.route, queryParams: { mode: 'edit' } });
+  }
+
   scheduleFrequency(): string {
     if (!this.report) return '';
     if (this.report.Month) {
