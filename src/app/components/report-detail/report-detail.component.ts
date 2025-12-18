@@ -99,11 +99,45 @@ import { ReportsService } from '../../services/reports.service';
 
           <!-- Monthly Schedule -->
           <ng-container *ngIf="report.scheduleType === 'Monthly'">
-            <label>Recurrence (months)</label>
-            <input type="number" [(ngModel)]="report.Month.fnRecurrenceMonths" 
-                   [disabled]="readOnly" min="1" />
+            <label>Recurrence</label>
+            <div class="recurrence-group">
+              <span>Every</span>
+              <input type="number" [(ngModel)]="report.Month.fnRecurrenceMonths" [disabled]="readOnly" min="1" style="width:60px;" />
+              <span>Month(s)</span>
+            </div>
 
-            <label>Hour (24h)</label>
+            <div class="radio-group">
+              <label><input type="radio" [checked]="!report.Month.fnRunOnLastDay" (change)="report.Month.fnRunOnLastDay = false" [disabled]="readOnly" /> On Day's</label>
+              <input type="number" [(ngModel)]="report.Month.fnDayOfMonth" [disabled]="readOnly" min="1" max="31" style="width:80px;" placeholder="Day" />
+            </div>
+
+            <div class="radio-group">
+              <label><input type="radio" [checked]="report.Month.fnRunOnLastDay" (change)="report.Month.fnRunOnLastDay = true" [disabled]="readOnly" /> On</label>
+              <select [(ngModel)]="report.Month.fnWeekOfMonth" [disabled]="readOnly" style="width:120px;">
+                <option value="">--Week No--</option>
+                <option [value]="1">First</option>
+                <option [value]="2">Second</option>
+                <option [value]="3">Third</option>
+                <option [value]="4">Fourth</option>
+                <option [value]="5">Last</option>
+              </select>
+              <select [(ngModel)]="report.Month.fnDayOfWeek" [disabled]="readOnly" style="width:120px;">
+                <option value="">--WeekDays--</option>
+                <option [value]="1">Sunday</option>
+                <option [value]="2">Monday</option>
+                <option [value]="3">Tuesday</option>
+                <option [value]="4">Wednesday</option>
+                <option [value]="5">Thursday</option>
+                <option [value]="6">Friday</option>
+                <option [value]="7">Saturday</option>
+              </select>
+            </div>
+
+            <div class="checkbox-group">
+              <label><input type="checkbox" [(ngModel)]="report.Month.fnRunMonthEnd" [disabled]="readOnly" /> Run Every Month End</label>
+            </div>
+
+            <label>Hour</label>
             <select [(ngModel)]="report.Month.fnRunHour" [disabled]="readOnly">
               <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
             </select>
@@ -116,28 +150,76 @@ import { ReportsService } from '../../services/reports.service';
 
           <!-- Weekly Schedule -->
           <ng-container *ngIf="report.scheduleType === 'Weekly'">
-            <label>Hour (24h)</label>
+            <label>Days</label>
+            <div class="weekdays-grid">
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnSunday" [disabled]="readOnly" /> Sunday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnMonday" [disabled]="readOnly" /> Monday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnTuesday" [disabled]="readOnly" /> Tuesday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnWednesday" [disabled]="readOnly" /> Wednesday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnThursday" [disabled]="readOnly" /> Thursday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnFriday" [disabled]="readOnly" /> Friday</label>
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnSaturday" [disabled]="readOnly" /> Saturday</label>
+            </div>
+
+            <label>Hour</label>
             <select [(ngModel)]="report.Week.fnRunHour" [disabled]="readOnly">
-              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
+              <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
             </select>
 
             <label>Minute</label>
             <select [(ngModel)]="report.Week.fnRunMinute" [disabled]="readOnly">
               <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
             </select>
+
+            <label>AM/PM</label>
+            <select [(ngModel)]="report.Week.fnRunAmPm" [disabled]="readOnly">
+              <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+            </select>
           </ng-container>
 
           <!-- Hourly Schedule -->
           <ng-container *ngIf="report.scheduleType === 'Hourly'">
-            <label>Recurrence (hours)</label>
-            <select [(ngModel)]="report.Hour.fnRecurrenceHours" [disabled]="readOnly">
-              <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
-            </select>
+            <label>Recurrence</label>
+            <div class="recurrence-group">
+              <span>Every</span>
+              <select [(ngModel)]="report.Hour.fnRecurrenceHours" [disabled]="readOnly" style="width:80px;">
+                <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+              </select>
+              <span>Hour(s)</span>
+            </div>
 
             <label>Run Minute</label>
             <select [(ngModel)]="report.Hour.fnRunMinute" [disabled]="readOnly">
               <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
             </select>
+
+            <label style="display:flex; gap:2rem; align-items:center;">
+              <span style="width:200px;">Start Time</span>
+              <span style="width:100px;">Hour</span>
+              <span style="width:100px;">AM/PM</span>
+            </label>
+            <div style="display:flex; gap:2rem; margin-left:200px;">
+              <select [(ngModel)]="report.Hour.fnStartHour" [disabled]="readOnly" style="width:100px;">
+                <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+              </select>
+              <select [(ngModel)]="report.Hour.fnStartAmPm" [disabled]="readOnly" style="width:100px;">
+                <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+              </select>
+            </div>
+
+            <label style="display:flex; gap:2rem; align-items:center; margin-top:0.5rem;">
+              <span style="width:200px;">End Time</span>
+              <span style="width:100px;">Hour</span>
+              <span style="width:100px;">AM/PM</span>
+            </label>
+            <div style="display:flex; gap:2rem; margin-left:200px;">
+              <select [(ngModel)]="report.Hour.fnEndHour" [disabled]="readOnly" style="width:100px;">
+                <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+              </select>
+              <select [(ngModel)]="report.Hour.fnEndAmPm" [disabled]="readOnly" style="width:100px;">
+                <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+              </select>
+            </div>
           </ng-container>
 
           <!-- By Minute Schedule -->
@@ -147,6 +229,11 @@ import { ReportsService } from '../../services/reports.service';
                    [disabled]="readOnly" min="1" />
           </ng-container>
         </div>
+      </div>
+
+      <div class="card workbook">
+        <h3>Use Existing Workbook</h3>
+        <label><input type="checkbox" [(ngModel)]="report.fnUpdateExistingWorkbook" [disabled]="readOnly" /> Use Existing Workbook</label>
       </div>
 
       <div class="card exports">
@@ -185,6 +272,28 @@ import { ReportsService } from '../../services/reports.service';
         </table>
       </div>
 
+      <div class="card sheets">
+        <div class="card-header">
+          <h3>Sheets</h3>
+          <button class="small" (click)="addSheet()" [disabled]="readOnly">+</button>
+        </div>
+        <table class="sheets-table" *ngIf="(report.Sheets || []).length > 0">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Hide?</th><th>Delete?</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sheet of report.Sheets; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td><input [(ngModel)]="sheet.fcSheetName" [disabled]="readOnly" placeholder="Name" /></td>
+              <td><input type="checkbox" [(ngModel)]="sheet.fnHide" [disabled]="readOnly" /></td>
+              <td><input type="checkbox" [(ngModel)]="sheet.fnDelete" [disabled]="readOnly" /></td>
+              <td><button class="small danger" (click)="removeSheet(i)" [disabled]="readOnly">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="(report.Sheets || []).length === 0" style="padding:1rem; text-align:center; color:#999;">None</div>
+      </div>
+
       <div class="card email">
         <h3>E-mail</h3>
         <label>Disable E-mail</label>
@@ -198,18 +307,32 @@ import { ReportsService } from '../../services/reports.service';
 
         <label>Body</label>
         <textarea rows="4" [(ngModel)]="report.EmailReport.fcBody" [disabled]="readOnly"></textarea>
+      </div>
 
-        <h4>E-mail Addresses <button class="small" (click)="addEmail()" [disabled]="readOnly">+</button></h4>
-        <div *ngIf="(report.EmailLists || []).length===0">No email addresses</div>
-        <div *ngFor="let e of report.EmailLists; let j = index" class="email-row">
-          <select [(ngModel)]="e.fcSendType" [disabled]="readOnly">
-            <option>To:</option>
-            <option>CC:</option>
-            <option>BCC:</option>
-          </select>
-          <input [(ngModel)]="e.fcEmailAddress" placeholder="address@domain.com" [disabled]="readOnly" />
-          <button class="small danger" (click)="removeEmail(j)" [disabled]="readOnly">Remove</button>
+      <div class="card email-addresses">
+        <div class="card-header">
+          <h3>E-mail Addresses</h3>
+          <button class="small" (click)="addEmail()" [disabled]="readOnly">+</button>
         </div>
+        <table class="email-table" *ngIf="(report.EmailLists || []).length > 0">
+          <thead>
+            <tr><th>Type</th><th>Address</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of report.EmailLists; let j = index">
+              <td>
+                <select [(ngModel)]="e.fcSendType" [disabled]="readOnly">
+                  <option>To:</option>
+                  <option>CC:</option>
+                  <option>BCC:</option>
+                </select>
+              </td>
+              <td><input [(ngModel)]="e.fcEmailAddress" placeholder="address@domain.com" [disabled]="readOnly" /></td>
+              <td><button class="small danger" (click)="removeEmail(j)" [disabled]="readOnly">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="(report.EmailLists || []).length === 0" style="padding:1rem; text-align:center; color:#999;">No email addresses</div>
       </div>
 
       <div class="card logs" *ngIf="(report.Logs || []).length > 0">
@@ -236,31 +359,60 @@ import { ReportsService } from '../../services/reports.service';
   styles: [
     `
     .report-edit { padding: 1rem; }
-    .header { display:flex; justify-content:space-between; align-items:center; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
     .actions { display:flex; gap:0.5rem; }
-    .btn { padding:6px 10px; border-radius:4px; }
+    .btn { padding:8px 12px; border-radius:4px; border:1px solid #ccc; background:#f5f5f5; cursor:pointer; }
+    .btn:hover { background:#e8e8e8; }
     .btn.primary { background:#2b6fbf; color:white; border:none; }
-    .top-row { display:flex; gap:1rem; }
-    .card { background:#fff; border:1px solid #ddd; padding:0.75rem; border-radius:4px; flex:1; }
+    .btn.primary:hover { background:#1f5490; }
+    .btn.danger { background:#d32f2f; color:white; border:none; }
+    .top-row { display:flex; gap:1rem; margin-bottom:1rem; }
+    .card { background:#fff; border:1px solid #ddd; padding:1rem; border-radius:4px; margin-bottom:1rem; }
+    .card h3 { background:#2b6fbf; color:white; padding:8px 12px; margin:-1rem -1rem 1rem -1rem; border-radius:4px 4px 0 0; }
     .card > label { display: inline-block; width: 200px; font-weight: bold; vertical-align: top; margin-bottom: 0.5rem; }
     .card > input,
     .card > textarea,
-    .card > select { display: inline-block; width: calc(100% - 220px); margin-bottom: 0.5rem; border:1px solid #ccc; padding:6px; box-sizing:border-box; }
+    .card > select { display: inline-block; width: calc(100% - 220px); margin-bottom: 0.5rem; border:1px solid #ccc; padding:6px; box-sizing:border-box; border-radius:3px; }
+    .card > input[type="checkbox"] { width: auto; margin-right: 0.5rem; }
+    .recurrence-group { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; }
+    .recurrence-group input { width:80px; }
+    .recurrence-group span { color:#666; }
+    .radio-group { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; }
+    .radio-group label { width:auto; margin-right:1rem; }
+    .radio-group input[type="radio"] { margin-right:0.3rem; }
+    .radio-group input[type="number"], .radio-group select { width:auto; }
+    .checkbox-group { margin-bottom:0.5rem; }
+    .checkbox-group label { display:flex; align-items:center; gap:0.5rem; width:auto; }
+    .checkbox-group input[type="checkbox"] { margin:0; }
+    .weekdays-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:0.5rem; margin-bottom:0.5rem; }
+    .weekdays-grid label { display:flex; align-items:center; gap:0.5rem; width:auto; font-weight:normal; }
+    .weekdays-grid input[type="checkbox"] { margin:0; }
     select { cursor: pointer; }
     .overview { max-width:60%; }
     .scheduling { max-width:35%; }
-    .exports-table { width:100%; border-collapse:collapse; }
-    .exports-table th, .exports-table td { border:1px solid #eee; padding:6px; }
+    .workbook { margin:1rem 0; }
+    .exports-table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .exports-table th, .exports-table td { border:1px solid #eee; padding:8px; text-align:left; }
+    .exports-table th { background:#f5f5f5; font-weight:bold; }
+    .email-table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .email-table th, .email-table td { border:1px solid #eee; padding:8px; text-align:left; }
+    .email-table th { background:#f5f5f5; font-weight:bold; }
+    .email-table td:last-child { text-align:center; }
+    .sheets-table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    .sheets-table th, .sheets-table td { border:1px solid #eee; padding:8px; text-align:left; }
+    .sheets-table th { background:#f5f5f5; font-weight:bold; }
+    .sheets-table td:last-child { text-align:center; }
+    .sheets-table input[type="text"] { width:100%; box-sizing:border-box; }
+    .sheets-table input[type="checkbox"] { margin:0; }
     .logs-table { width:100%; border-collapse:collapse; margin-top:1rem; }
-    .logs-table th, .logs-table td { border:1px solid #eee; padding:6px; text-align:left; }
+    .logs-table th, .logs-table td { border:1px solid #eee; padding:8px; text-align:left; }
     .logs-table th { background:#f5f5f5; font-weight:bold; }
     .error-msg { color:#d32f2f; font-size:0.9rem; margin-top:-0.4rem; display:block; margin-left:220px; }
-    /* View mode: hide input/textarea borders and backgrounds for read-only appearance */
     .view-mode textarea,
-    .view-mode input { border:none; background:transparent; padding:6px 0; }
-    .card h3, .card h4 { margin-bottom: 0.5rem; }
-    .email-row { margin-bottom: 0.5rem; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; }
+    .view-mode input[type="text"] { border:none; background:transparent; padding:6px 0; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin:-1rem -1rem 1rem -1rem; padding:0.75rem 1rem; background:#f5f5f5; border-bottom:1px solid #ddd; }
+    .card-header h3 { margin:0; }
+    .small { padding:4px 8px; font-size:0.85rem; }
     `
   ]
 })
@@ -555,13 +707,40 @@ export class ReportDetailComponent implements OnInit {
 
     switch (this.report.scheduleType) {
       case 'Monthly':
-        this.report.Month = { fnRecurrenceMonths: 1, fnRunHour: 0, fnRunMinute: 0 };
+        this.report.Month = {
+          fnRecurrenceMonths: 1,
+          fnRunOnLastDay: false,
+          fnDayOfMonth: 1,
+          fnWeekOfMonth: null,
+          fnDayOfWeek: null,
+          fnRunMonthEnd: false,
+          fnRunHour: 0,
+          fnRunMinute: 0
+        };
         break;
       case 'Weekly':
-        this.report.Week = { fnRunHour: 0, fnRunMinute: 0 };
+        this.report.Week = {
+          fnSunday: false,
+          fnMonday: true,
+          fnTuesday: true,
+          fnWednesday: true,
+          fnThursday: true,
+          fnFriday: true,
+          fnSaturday: false,
+          fnRunHour: 7,
+          fnRunMinute: 0,
+          fnRunAmPm: 'AM'
+        };
         break;
       case 'Hourly':
-        this.report.Hour = { fnRecurrenceHours: 1, fnRunMinute: 0 };
+        this.report.Hour = {
+          fnRecurrenceHours: 1,
+          fnRunMinute: 0,
+          fnStartHour: 6,
+          fnStartAmPm: 'AM',
+          fnEndHour: 6,
+          fnEndAmPm: 'PM'
+        };
         break;
       case 'By Minute':
         this.report.Minute = { fnRecurrenceMinutes: 1 };
@@ -571,7 +750,6 @@ export class ReportDetailComponent implements OnInit {
         this.report.Adhoc = { fdDateTime: new Date().toISOString() };
         this.report.adhocDate = new Date().toISOString().split('T')[0];
         const hours24 = new Date().getHours();
-        // Convert 24-hour format to 12-hour format (0-23 -> 1-12)
         this.report.adhocHour = hours24 % 12 === 0 ? 12 : hours24 % 12;
         this.report.adhocMinute = new Date().getMinutes();
         this.report.adhocAmPm = hours24 >= 12 ? 'PM' : 'AM';
@@ -636,6 +814,18 @@ export class ReportDetailComponent implements OnInit {
   removeEmail(idx: number) {
     if (!this.report?.EmailLists) return;
     this.report.EmailLists.splice(idx, 1);
+  }
+
+  // Sheets CRUD
+  addSheet() {
+    const newSheet = { fnSheetID: 0, fnReportID: this.report?.fnReportID || 0, fcSheetName: '', fnHide: false, fnDelete: false };
+    this.report.Sheets = this.report.Sheets || [];
+    this.report.Sheets.push(newSheet);
+  }
+
+  removeSheet(idx: number) {
+    if (!this.report?.Sheets) return;
+    this.report.Sheets.splice(idx, 1);
   }
 
   onFileExtensionChange(ex: any) {
