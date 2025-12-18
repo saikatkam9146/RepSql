@@ -306,15 +306,20 @@ export class ReportDetailComponent implements OnInit {
           this.report = normalized.report;
           console.log('[ReportDetail] Normalized report:', this.report);
           console.log('[ReportDetail] Report Logs:', this.report.Logs);
+          console.log('[ReportDetail] Report Status:', this.report.Status);
           // Extract nested lists if they exist in the response
           this.fileExtensions = (this.payload as any).FileExtensions || normalized.fileExtensions || [];
           this.delimiters = (this.payload as any).Delimiters || normalized.delimiters || [];
           this.databases = (this.payload as any).Databases || [];
           this.users = (this.payload as any).Users || [];
           this.departments = (this.payload as any).Departments || [];
+          console.log('[ReportDetail] Databases:', this.databases);
+          console.log('[ReportDetail] Departments:', this.departments);
+          console.log('[ReportDetail] Users:', this.users);
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
           this.initializeScheduleType();
+          this.populateDropdownsIfEmpty();
         }
         this.isLoaded = true;
       }, err => { console.error(err); this.isLoaded = true; });
@@ -331,28 +336,66 @@ export class ReportDetailComponent implements OnInit {
           this.databases = (this.payload as any).Databases || [];
           this.users = (this.payload as any).Users || [];
           this.departments = (this.payload as any).Departments || [];
+          console.log('[ReportDetail] Setup Databases:', this.databases);
+          console.log('[ReportDetail] Setup Departments:', this.departments);
+          console.log('[ReportDetail] Setup Users:', this.users);
           this.report.Exports = this.report.Exports || [];
           this.report.EmailLists = this.report.EmailLists || [];
           // Ensure ID is 0 for new report
           this.report.fnReportID = 0;
           this.initializeScheduleType();
+          this.populateDropdownsIfEmpty();
         } else {
           // fallback if API fails
           this.report = this.createEmptyReport();
+          this.populateDropdownsIfEmpty();
         }
         this.isLoaded = true;
       }, err => {
         console.error('Failed to fetch initial setup data, using defaults', err);
         this.report = this.createEmptyReport();
+        this.populateDropdownsIfEmpty();
         this.isLoaded = true;
+      });
+    }
+  }
+
+  populateDropdownsIfEmpty() {
+    // Fetch lookup data if dropdowns are empty
+    if (this.databases.length === 0 || this.departments.length === 0 || this.users.length === 0) {
+      console.log('[ReportDetail] Fetching lookup data...');
+      this.reportsService.getReportSetup().subscribe(r => {
+        if (r) {
+          this.databases = r.Databases || this.databases;
+          this.departments = r.Departments || this.departments;
+          this.users = r.Users || this.users;
+          console.log('[ReportDetail] Lookup data fetched - Databases:', this.databases.length, 'Departments:', this.departments.length, 'Users:', this.users.length);
+        }
+      }, err => {
+        console.warn('[ReportDetail] Failed to fetch lookup data', err);
       });
     }
   }
 
   initializeScheduleType() {
     if (!this.report) return;
+    console.log('[ReportDetail] initializeScheduleType - Checking report:', {
+      hasAdhoc: !!this.report.Adhoc,
+      hasMonth: !!this.report.Month,
+      hasWeek: !!this.report.Week,
+      hasHour: !!this.report.Hour,
+      hasMinute: !!this.report.Minute
+    });
     if (this.report.Adhoc) {
       this.report.scheduleType = 'Ad Hoc';
+      // Populate adhoc date fields from Adhoc.fdDateTime if available
+      if (this.report.Adhoc.fdDateTime) {
+        const dt = new Date(this.report.Adhoc.fdDateTime);
+        this.report.adhocDate = dt.toISOString().split('T')[0];
+        this.report.adhocHour = dt.getHours();
+        this.report.adhocMinute = dt.getMinutes();
+        this.report.adhocAmPm = dt.getHours() >= 12 ? 'PM' : 'AM';
+      }
     } else if (this.report.Month) {
       this.report.scheduleType = 'Monthly';
     } else if (this.report.Week) {
@@ -364,6 +407,7 @@ export class ReportDetailComponent implements OnInit {
     } else {
       this.report.scheduleType = 'Ad Hoc';
     }
+    console.log('[ReportDetail] Schedule type set to:', this.report.scheduleType);
   }
 
   createEmptyReport() {
@@ -385,7 +429,7 @@ export class ReportDetailComponent implements OnInit {
       Hour: null,
       Minute: null,
       Adhoc: null,
-      Status: null,
+      Status: { fnStatusId: 1 }, // Initialize Status so buttons show
       scheduleType: 'Ad Hoc',
       adhocDate: new Date().toISOString().split('T')[0],
       adhocHour: 0,
@@ -626,16 +670,31 @@ export class ReportDetailComponent implements OnInit {
       base.Hour = payload.Hour || (payload.Report as any).Hour || base.Hour || null;
       base.Minute = payload.Minute || (payload.Report as any).Minute || base.Minute || null;
       base.Adhoc = payload.Adhoc || (payload.Report as any).Adhoc || base.Adhoc || null;
+      base.Status = payload.Status || (payload.Report as any).Status || base.Status || { fnStatusId: 1 };
       base.Logs = payload.Logs || payload.ErrorLogs || (payload.Report as any).Logs || (payload.Report as any).ErrorLogs || base.Logs || [];
       console.log('[normalizeReportPayload] Extracted Logs:', base.Logs);
+      console.log('[normalizeReportPayload] Extracted Status:', base.Status);
+
+      // Set initial dropdown values if available
+      if (base.DatabaseConnection && !base.fnConnectionID) {
+        base.fnConnectionID = base.DatabaseConnection.fnDatabaseConnectionID;
+      }
+      if (base.Department && !base.fnDepartmentID) {
+        base.fnDepartmentID = base.Department.fnDepartmentID;
+      }
+      if (base.User && !base.fnUserID) {
+        base.fnUserID = base.User.fnUserID;
+      }
 
       return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
     }
 
     // If payload already looks flattened (has fnReportID or fcReportName), use as-is
     if (payload.fnReportID !== undefined || payload.fcReportName !== undefined) {
+      payload.Status = payload.Status || { fnStatusId: 1 };
       payload.Logs = payload.Logs || payload.ErrorLogs || [];
       console.log('[normalizeReportPayload] Flattened Logs:', payload.Logs);
+      console.log('[normalizeReportPayload] Flattened Status:', payload.Status);
       return { report: payload, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };
     }
 
