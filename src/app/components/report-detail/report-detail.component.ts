@@ -111,9 +111,13 @@ import { ReportsService } from '../../services/reports.service';
               <input type="number" [(ngModel)]="report.Month.fnDayOfMonth" [disabled]="readOnly" min="1" max="31" style="width:80px;" placeholder="Day" />
             </div>
 
+            <div style="display:flex; align-items:center; margin-bottom:0.5rem; font-weight:bold; color:#666;">
+              <span style="margin-left:20px;">OR</span>
+            </div>
+
             <div class="radio-group">
               <label><input type="radio" [checked]="report.Month.fnRunOnLastDay" (change)="report.Month.fnRunOnLastDay = true" [disabled]="readOnly" /> On</label>
-              <select [(ngModel)]="report.Month.fnWeekOfMonth" [disabled]="readOnly" style="width:120px;">
+              <select [(ngModel)]="report.Month.fnWeekOfMonth" [disabled]="readOnly" style="width:120px;" title="Week Number">
                 <option value="">--Week No--</option>
                 <option [value]="1">First</option>
                 <option [value]="2">Second</option>
@@ -121,8 +125,8 @@ import { ReportsService } from '../../services/reports.service';
                 <option [value]="4">Fourth</option>
                 <option [value]="5">Last</option>
               </select>
-              <select [(ngModel)]="report.Month.fnDayOfWeek" [disabled]="readOnly" style="width:120px;">
-                <option value="">--WeekDays--</option>
+              <select [(ngModel)]="report.Month.fnDayOfWeek" [disabled]="readOnly" style="width:120px;" title="Days">
+                <option value="">--Days--</option>
                 <option [value]="1">Sunday</option>
                 <option [value]="2">Monday</option>
                 <option [value]="3">Tuesday</option>
@@ -137,10 +141,19 @@ import { ReportsService } from '../../services/reports.service';
               <label><input type="checkbox" [(ngModel)]="report.Month.fnRunMonthEnd" [disabled]="readOnly" /> Run Every Month End</label>
             </div>
 
-            <label>Hour</label>
-            <select [(ngModel)]="report.Month.fnRunHour" [disabled]="readOnly">
-              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
-            </select>
+            <label style="display:flex; gap:2rem; align-items:center;">
+              <span style="width:200px;">Run At</span>
+              <span style="width:80px;">Hour</span>
+              <span style="width:80px;">AM/PM</span>
+            </label>
+            <div style="display:flex; gap:2rem; margin-left:200px; margin-bottom:0.5rem;">
+              <select [(ngModel)]="report.Month.fnRunHour" [disabled]="readOnly" style="width:80px;">
+                <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+              </select>
+              <select [(ngModel)]="report.Month.fnRunAmPm" [disabled]="readOnly" style="width:80px;">
+                <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+              </select>
+            </div>
 
             <label>Minute</label>
             <select [(ngModel)]="report.Month.fnRunMinute" [disabled]="readOnly">
@@ -161,19 +174,27 @@ import { ReportsService } from '../../services/reports.service';
               <label><input type="checkbox" [(ngModel)]="report.Week.fnSaturday" [disabled]="readOnly" /> Saturday</label>
             </div>
 
-            <label>Hour</label>
-            <select [(ngModel)]="report.Week.fnRunHour" [disabled]="readOnly">
-              <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
-            </select>
+            <div class="checkbox-group">
+              <label><input type="checkbox" [(ngModel)]="report.Week.fnRunMonthEnd" [disabled]="readOnly" /> Run Every Month End</label>
+            </div>
+
+            <label style="display:flex; gap:2rem; align-items:center;">
+              <span style="width:200px;">Run At</span>
+              <span style="width:80px;">Hour</span>
+              <span style="width:80px;">AM/PM</span>
+            </label>
+            <div style="display:flex; gap:2rem; margin-left:200px; margin-bottom:0.5rem;">
+              <select [(ngModel)]="report.Week.fnRunHour" [disabled]="readOnly" style="width:80px;">
+                <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
+              </select>
+              <select [(ngModel)]="report.Week.fnRunAmPm" [disabled]="readOnly" style="width:80px;">
+                <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
+              </select>
+            </div>
 
             <label>Minute</label>
             <select [(ngModel)]="report.Week.fnRunMinute" [disabled]="readOnly">
               <option *ngFor="let m of minuteOptions" [value]="m">{{ m | number:'2.0-0' }}</option>
-            </select>
-
-            <label>AM/PM</label>
-            <select [(ngModel)]="report.Week.fnRunAmPm" [disabled]="readOnly">
-              <option *ngFor="let ap of ampmOptions" [value]="ap">{{ ap }}</option>
             </select>
           </ng-container>
 
@@ -224,9 +245,13 @@ import { ReportsService } from '../../services/reports.service';
 
           <!-- By Minute Schedule -->
           <ng-container *ngIf="report.scheduleType === 'By Minute'">
-            <label>Recurrence (minutes)</label>
-            <input type="number" [(ngModel)]="report.Minute.fnRecurrenceMinutes" 
-                   [disabled]="readOnly" min="1" />
+            <label>Recurrence</label>
+            <div class="recurrence-group">
+              <span>Every</span>
+              <input type="number" [(ngModel)]="report.Minute.fnRecurrenceMinutes" 
+                     [disabled]="readOnly" min="1" style="width:80px;" />
+              <span>Minute(s)</span>
+            </div>
           </ng-container>
         </div>
       </div>
