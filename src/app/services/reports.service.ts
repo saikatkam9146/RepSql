@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ReportList, Setup, CheckSQL, ActiveSuspendReport, ProcessReportQuery, ReportComplex, Export } from '../models/reports.model';
 import { ReportQueryOptions } from '../models/report-query-options.model';
@@ -51,36 +51,113 @@ export class ReportsService {
   }
 
   // POST /api/report/GetReport (no params) returns ReportEdit object with initial setup data for creating
+  // Also fetches Databases, Departments, Users from getSetupData() and merges them
   getReportSetup(): Observable<any> {
     const url = `${this.base}/GetReport`;
     console.log('[ReportsService] getReportSetup() - POST', url, 'with empty body (no params)');
-    return this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(catchError(err => {
-      console.warn('getReportSetup failed, returning minimal defaults', err);
-      return of({
-        fnReportID: 0,
-        fcReportName: '',
-        fcSQL: '',
-        Exports: [],
-        EmailLists: [],
-        EmailReport: { fnDisable: false, fcFrom: '', fcSubject: '', fcBody: '' }
-      });
-    }));
+    
+    // Fetch both report setup and master setup data in parallel
+    return forkJoin({
+      report: this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(
+        catchError(err => {
+          console.warn('getReportSetup report endpoint failed', err);
+          return of({
+            fnReportID: 0,
+            fcReportName: '',
+            fcSQL: '',
+            Exports: [],
+            EmailLists: [],
+            EmailReport: { fnDisable: false, fcFrom: '', fcSubject: '', fcBody: '' }
+          });
+        })
+      ),
+      setup: this.getSetupData().pipe(
+        catchError(err => {
+          console.warn('getReportSetup setup data failed', err);
+          return of({ Users: [], Departments: [], DatabaseConnection: [] });
+        })
+      )
+    }).pipe(
+      map(({ report, setup }) => {
+        // Merge setup data into report response
+        return {
+          ...report,
+          Databases: setup.DatabaseConnection || [],
+          Departments: setup.Departments || [],
+          Users: setup.Users || []
+        } as any;
+      }),
+      catchError(err => {
+        console.warn('getReportSetup forkJoin failed, returning minimal defaults', err);
+        return of({
+          fnReportID: 0,
+          fcReportName: '',
+          fcSQL: '',
+          Exports: [],
+          EmailLists: [],
+          EmailReport: { fnDisable: false, fcFrom: '', fcSubject: '', fcBody: '' },
+          Databases: [],
+          Departments: [],
+          Users: []
+        });
+      })
+    );
   }
 
   // POST /api/report/GetReport(id, isAdmin) returns ReportEdit object for editing
+  // Also fetches Databases, Departments, Users and merges them with report data
   getReport(reportid: number) {
     const url = `${this.base}/GetReport?id=${reportid}&isAdmin=1`;
     console.log('[ReportsService] getReport() - POST', url);
-    return this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(catchError(err => {
-      console.warn('getReport failed, falling back to asset', err);
-      return this.http.get<ReportList>('/assets/sample-reports.json').pipe(map(list => {
-        const found = (list.Reports || []).find(r => r.Report?.fnReportID === reportid);
-        return found || null;
-      }), catchError(e => {
-        console.error('fallback sample-reports read failed', e);
-        return of(null);
-      }));
-    }));
+    
+    // Fetch both report data and master setup data in parallel
+    return forkJoin({
+      report: this.http.post<any>(url, {}, this.jsonOptionsWithCredentials).pipe(
+        catchError(err => {
+          console.warn('getReport report endpoint failed', err);
+          return of(null);
+        })
+      ),
+      setup: this.getSetupData().pipe(
+        catchError(err => {
+          console.warn('getReport setup data failed', err);
+          return of({ Users: [], Departments: [], DatabaseConnection: [] });
+        })
+      )
+    }).pipe(
+      map(({ report, setup }) => {
+        if (!report) {
+          // Fallback to sample data if API fails
+          return null;
+        }
+        // Merge setup data into report response
+        return {
+          ...report,
+          Databases: setup.DatabaseConnection || [],
+          Departments: setup.Departments || [],
+          Users: setup.Users || []
+        } as any;
+      }),
+      catchError(err => {
+        console.warn('getReport forkJoin failed, trying sample data fallback', err);
+        return this.http.get<ReportList>('/assets/sample-reports.json').pipe(map(list => {
+          const found = (list.Reports || []).find(r => r.Report?.fnReportID === reportid) as any;
+          if (found) {
+            // Add empty lookup arrays if not in sample
+            return {
+              ...found,
+              Databases: found.Databases || [],
+              Departments: found.Departments || [],
+              Users: found.Users || []
+            } as any;
+          }
+          return null;
+        }), catchError(e => {
+          console.error('fallback sample-reports read failed', e);
+          return of(null);
+        }));
+      })
+    );
   }
 
   // Create a new report. If backend fails, fall back to localStorage-based persistence so dev/test flow continues.
