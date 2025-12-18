@@ -216,10 +216,10 @@ import { ReportsService } from '../../services/reports.service';
 
             <label style="display:flex; gap:2rem; align-items:center;">
               <span style="width:200px;">Start Time</span>
-              <span style="width:100px;">Hour</span>
-              <span style="width:100px;">AM/PM</span>
+              <span style="width:100px; text-align:center;">Hour</span>
+              <span style="width:100px; text-align:center;">AM/PM</span>
             </label>
-            <div style="display:flex; gap:2rem; margin-left:200px;">
+            <div style="display:flex; gap:2rem; margin-left:200px; margin-bottom:0.5rem;">
               <select [(ngModel)]="report.Hour.fnStartHour" [disabled]="readOnly" style="width:100px;">
                 <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
               </select>
@@ -230,10 +230,10 @@ import { ReportsService } from '../../services/reports.service';
 
             <label style="display:flex; gap:2rem; align-items:center; margin-top:0.5rem;">
               <span style="width:200px;">End Time</span>
-              <span style="width:100px;">Hour</span>
-              <span style="width:100px;">AM/PM</span>
+              <span style="width:100px; text-align:center;">Hour</span>
+              <span style="width:100px; text-align:center;">AM/PM</span>
             </label>
-            <div style="display:flex; gap:2rem; margin-left:200px;">
+            <div style="display:flex; gap:2rem; margin-left:200px; margin-bottom:0.5rem;">
               <select [(ngModel)]="report.Hour.fnEndHour" [disabled]="readOnly" style="width:100px;">
                 <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
               </select>
@@ -245,8 +245,7 @@ import { ReportsService } from '../../services/reports.service';
 
           <!-- By Minute Schedule -->
           <ng-container *ngIf="report.scheduleType === 'By Minute'">
-            <label>Recurrence</label>
-            <div class="recurrence-group">
+            <div class="recurrence-group" style="margin-bottom:0;">
               <span>Every</span>
               <input type="number" [(ngModel)]="report.Minute.fnRecurrenceMinutes" 
                      [disabled]="readOnly" min="1" style="width:80px;" />
