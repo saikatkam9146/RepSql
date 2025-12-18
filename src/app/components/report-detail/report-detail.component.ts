@@ -174,9 +174,9 @@ import { ReportsService } from '../../services/reports.service';
           </thead>
           <tbody>
             <tr *ngFor="let log of report.Logs">
-              <td>{{ log.fnLogID }}</td>
-              <td>{{ log.fdDateTime | date:'short' }}</td>
-              <td>{{ log.fcErrorMessage }}</td>
+              <td>{{ log.LogId }}</td>
+              <td>{{ log.Timestamp }}</td>
+              <td>{{ log.Message }}</td>
             </tr>
           </tbody>
         </table>
