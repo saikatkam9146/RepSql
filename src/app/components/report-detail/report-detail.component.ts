@@ -16,7 +16,8 @@ import { ReportsService } from '../../services/reports.service';
         <div class="actions">
           <button *ngIf="!readOnly" class="btn primary" (click)="save()">💾 Save</button>
           <button *ngIf="readOnly" class="btn" (click)="enterEditMode()">✏️ Edit</button>
-          <button class="btn" (click)="suspend()">Suspend</button>
+          <button *ngIf="canSuspendReport()" class="btn" (click)="suspendReport()">Suspend Report</button>
+          <button *ngIf="canActivateReport()" class="btn" (click)="activateReport()">Activate Report</button>
           <button class="btn" (click)="cancel()">Cancel</button>
         </div>
       </div>
@@ -423,12 +424,36 @@ export class ReportDetailComponent implements OnInit {
     });
   }
 
-  cancel() { this.router.navigate(['/reports']); }
+  canSuspendReport(): boolean {
+    return this.report?.Status != null && this.report.Status.fnStatusId != 6;
+  }
 
-  enterEditMode() {
-    this.readOnly = false;
-    // update URL to reflect edit mode
-    this.router.navigate([], { relativeTo: this.route, queryParams: { mode: 'edit' } });
+  canActivateReport(): boolean {
+    return this.report?.Status != null && this.report.Status.fnStatusId == 6;
+  }
+
+  suspendReport() {
+    if (!this.report) return;
+    const payload = { Report: this.report, SuspendFlag: true };
+    this.reportsService.activeSuspendReport(payload).subscribe(r => {
+      alert('Report suspended successfully.');
+      this.router.navigate(['/reports']);
+    }, err => {
+      console.error('Suspend failed', err);
+      alert('Suspend failed. See console for details.');
+    });
+  }
+
+  activateReport() {
+    if (!this.report) return;
+    const payload = { Report: this.report, SuspendFlag: false };
+    this.reportsService.activeSuspendReport(payload).subscribe(r => {
+      alert('Report activated successfully.');
+      this.router.navigate(['/reports']);
+    }, err => {
+      console.error('Activate failed', err);
+      alert('Activate failed. See console for details.');
+    });
   }
 
   scheduleFrequency(): string {
