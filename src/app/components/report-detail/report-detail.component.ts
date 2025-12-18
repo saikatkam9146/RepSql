@@ -83,7 +83,7 @@ import { ReportsService } from '../../services/reports.service';
 
             <label>Hour</label>
             <select [(ngModel)]="report.adhocHour" [disabled]="readOnly">
-              <option *ngFor="let h of hourOptions" [value]="h">{{ h }}</option>
+              <option *ngFor="let h of hourlyRecurrenceOptions" [value]="h">{{ h }}</option>
             </select>
 
             <label>Minute</label>
@@ -394,9 +394,11 @@ export class ReportDetailComponent implements OnInit {
       if (this.report.Adhoc.fdDateTime) {
         const dt = new Date(this.report.Adhoc.fdDateTime);
         this.report.adhocDate = dt.toISOString().split('T')[0];
-        this.report.adhocHour = dt.getHours();
+        const hours24 = dt.getHours();
+        // Convert 24-hour format to 12-hour format (0-23 -> 1-12)
+        this.report.adhocHour = hours24 % 12 === 0 ? 12 : hours24 % 12;
         this.report.adhocMinute = dt.getMinutes();
-        this.report.adhocAmPm = dt.getHours() >= 12 ? 'PM' : 'AM';
+        this.report.adhocAmPm = hours24 >= 12 ? 'PM' : 'AM';
       }
     } else if (this.report.Month) {
       this.report.scheduleType = 'Monthly';
@@ -413,6 +415,11 @@ export class ReportDetailComponent implements OnInit {
   }
 
   createEmptyReport() {
+    const now = new Date();
+    const hours24 = now.getHours();
+    // Convert 24-hour format to 12-hour format (0-23 -> 1-12)
+    const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+    
     return {
       fnReportID: 0,
       fcReportName: '',
@@ -433,10 +440,10 @@ export class ReportDetailComponent implements OnInit {
       Adhoc: null,
       Status: { fnStatusId: 1 }, // Initialize Status so buttons show
       scheduleType: 'Ad Hoc',
-      adhocDate: new Date().toISOString().split('T')[0],
-      adhocHour: 0,
-      adhocMinute: 0,
-      adhocAmPm: 'AM'
+      adhocDate: now.toISOString().split('T')[0],
+      adhocHour: hours12,
+      adhocMinute: now.getMinutes(),
+      adhocAmPm: hours24 >= 12 ? 'PM' : 'AM'
     } as any;
   }
 
@@ -563,9 +570,11 @@ export class ReportDetailComponent implements OnInit {
       default:
         this.report.Adhoc = { fdDateTime: new Date().toISOString() };
         this.report.adhocDate = new Date().toISOString().split('T')[0];
-        this.report.adhocHour = new Date().getHours();
+        const hours24 = new Date().getHours();
+        // Convert 24-hour format to 12-hour format (0-23 -> 1-12)
+        this.report.adhocHour = hours24 % 12 === 0 ? 12 : hours24 % 12;
         this.report.adhocMinute = new Date().getMinutes();
-        this.report.adhocAmPm = this.report.adhocHour >= 12 ? 'PM' : 'AM';
+        this.report.adhocAmPm = hours24 >= 12 ? 'PM' : 'AM';
     }
   }
 
