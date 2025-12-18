@@ -294,45 +294,75 @@ import { ReportsService } from '../../services/reports.service';
         <div *ngIf="(report.Sheets || []).length === 0" style="padding:1rem; text-align:center; color:#999;">None</div>
       </div>
 
-      <div class="card email">
-        <h3>E-mail</h3>
-        <label>Disable E-mail</label>
-        <input type="checkbox" [(ngModel)]="report.EmailReport.fnDisable" [disabled]="readOnly" />
+      <div class="email-section">
+        <div class="card email">
+          <h3>E-mail</h3>
+          
+          <div class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="report.EmailReport.fnDisable" [disabled]="readOnly" />
+            <label style="font-weight:bold; margin-left:0.5rem;">Disable E-mail</label>
+          </div>
 
-        <label>From</label>
-        <input [(ngModel)]="report.EmailReport.fcFrom" [disabled]="readOnly" />
+          <label>From</label>
+          <input [(ngModel)]="report.EmailReport.fcFrom" [disabled]="readOnly" />
 
-        <label>Subject</label>
-        <input [(ngModel)]="report.EmailReport.fcSubject" [disabled]="readOnly" />
+          <label>Subject</label>
+          <input [(ngModel)]="report.EmailReport.fcSubject" [disabled]="readOnly" />
 
-        <label>Body</label>
-        <textarea rows="4" [(ngModel)]="report.EmailReport.fcBody" [disabled]="readOnly"></textarea>
-      </div>
+          <label>Body</label>
+          <textarea rows="6" [(ngModel)]="report.EmailReport.fcBody" [disabled]="readOnly"></textarea>
 
-      <div class="card email-addresses">
-        <div class="card-header">
-          <h3>E-mail Addresses</h3>
-          <button class="small" (click)="addEmail()" [disabled]="readOnly">+</button>
+          <div class="checkbox-item">
+            <input type="checkbox" [(ngModel)]="report.EmailReport.fnAttachment" [disabled]="readOnly" (change)="onAttachmentChange()" />
+            <label style="font-weight:bold; margin-left:0.5rem;">Attach File</label>
+          </div>
+
+          <ng-container *ngIf="report.EmailReport.fnAttachment">
+            <label>Attachment</label>
+            <input [(ngModel)]="report.EmailReport.fcAttachmentName" [disabled]="readOnly" placeholder="File name or path" />
+
+            <div class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="report.EmailReport.fnSendSecure" [disabled]="readOnly" />
+              <label style="margin-left:0.5rem;">Send Secure</label>
+            </div>
+
+            <div class="checkbox-item">
+              <input type="checkbox" [(ngModel)]="report.EmailReport.fnZipFile" [disabled]="readOnly" />
+              <label style="margin-left:0.5rem;">Send Zip</label>
+            </div>
+
+            <ng-container *ngIf="report.EmailReport.fnZipFile">
+              <label>Zip Password</label>
+              <input type="password" [(ngModel)]="report.EmailReport.fcZipPassword" [disabled]="readOnly" />
+            </ng-container>
+          </ng-container>
         </div>
-        <table class="email-table" *ngIf="(report.EmailLists || []).length > 0">
-          <thead>
-            <tr><th>Type</th><th>Address</th><th></th></tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of report.EmailLists; let j = index">
-              <td>
-                <select [(ngModel)]="e.fcSendType" [disabled]="readOnly">
-                  <option>To:</option>
-                  <option>CC:</option>
-                  <option>BCC:</option>
-                </select>
-              </td>
-              <td><input [(ngModel)]="e.fcEmailAddress" placeholder="address@domain.com" [disabled]="readOnly" /></td>
-              <td><button class="small danger" (click)="removeEmail(j)" [disabled]="readOnly">Remove</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <div *ngIf="(report.EmailLists || []).length === 0" style="padding:1rem; text-align:center; color:#999;">No email addresses</div>
+
+        <div class="card email-addresses">
+          <div class="card-header">
+            <h3>E-mail Addresses</h3>
+            <button class="small" (click)="addEmail()" [disabled]="readOnly">+</button>
+          </div>
+          <table class="email-table" *ngIf="(report.EmailLists || []).length > 0">
+            <thead>
+              <tr><th>Type</th><th>Address</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of report.EmailLists; let j = index">
+                <td>
+                  <select [(ngModel)]="e.fcSendType" [disabled]="readOnly">
+                    <option>To:</option>
+                    <option>CC:</option>
+                    <option>BCC:</option>
+                  </select>
+                </td>
+                <td><input [(ngModel)]="e.fcEmailAddress" placeholder="address@domain.com" [disabled]="readOnly" /></td>
+                <td><button class="small danger" (click)="removeEmail(j)" [disabled]="readOnly">Remove</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="(report.EmailLists || []).length === 0" style="padding:1rem; text-align:center; color:#999;">No email addresses</div>
+        </div>
       </div>
 
       <div class="card logs" *ngIf="(report.Logs || []).length > 0">
@@ -367,6 +397,8 @@ import { ReportsService } from '../../services/reports.service';
     .btn.primary:hover { background:#1f5490; }
     .btn.danger { background:#d32f2f; color:white; border:none; }
     .top-row { display:flex; gap:1rem; margin-bottom:1rem; }
+    .email-section { display:flex; gap:1rem; margin-bottom:1rem; }
+    .email-section .card { flex:1; }
     .card { background:#fff; border:1px solid #ddd; padding:1rem; border-radius:4px; margin-bottom:1rem; }
     .card h3 { background:#2b6fbf; color:white; padding:8px 12px; margin:-1rem -1rem 1rem -1rem; border-radius:4px 4px 0 0; }
     .card > label { display: inline-block; width: 200px; font-weight: bold; vertical-align: top; margin-bottom: 0.5rem; }
@@ -384,6 +416,8 @@ import { ReportsService } from '../../services/reports.service';
     .checkbox-group { margin-bottom:0.5rem; }
     .checkbox-group label { display:flex; align-items:center; gap:0.5rem; width:auto; }
     .checkbox-group input[type="checkbox"] { margin:0; }
+    .checkbox-item { display:flex; align-items:center; margin-bottom:0.5rem; }
+    .checkbox-item input[type="checkbox"] { margin:0; }
     .weekdays-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:0.5rem; margin-bottom:0.5rem; }
     .weekdays-grid label { display:flex; align-items:center; gap:0.5rem; width:auto; font-weight:normal; }
     .weekdays-grid input[type="checkbox"] { margin:0; }
@@ -814,6 +848,16 @@ export class ReportDetailComponent implements OnInit {
   removeEmail(idx: number) {
     if (!this.report?.EmailLists) return;
     this.report.EmailLists.splice(idx, 1);
+  }
+
+  onAttachmentChange() {
+    // When Attach File is unchecked, clear attachment-related fields
+    if (!this.report?.EmailReport?.fnAttachment) {
+      this.report.EmailReport.fcAttachmentName = '';
+      this.report.EmailReport.fnSendSecure = false;
+      this.report.EmailReport.fnZipFile = false;
+      this.report.EmailReport.fcZipPassword = '';
+    }
   }
 
   // Sheets CRUD
