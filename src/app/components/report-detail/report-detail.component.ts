@@ -32,7 +32,7 @@ import { ReportsService } from '../../services/reports.service';
           <ng-container *ngIf="!readOnly">
             <select [(ngModel)]="report.fnConnectionID" (change)="onDatabaseChange()" [disabled]="readOnly">
               <option [value]="null">-- Select Database --</option>
-              <option *ngFor="let db of databases" [value]="db.fnDatabaseConnectionID">{{ db.fcConnectionName }}</option>
+              <option *ngFor="let db of databases" [value]="db.fnConnectionID">{{ db.fcConnectionName }}</option>
             </select>
           </ng-container>
           <ng-container *ngIf="readOnly">
@@ -315,7 +315,7 @@ export class ReportDetailComponent implements OnInit {
           this.databases = (this.payload as any).Databases || [];
           this.users = (this.payload as any).Users || [];
           this.departments = (this.payload as any).Departments || [];
-          console.log('[ReportDetail] Databases:', this.databases.map((d: any) => ({ id: d.fnDatabaseConnectionID, name: d.fcConnectionName })));
+          console.log('[ReportDetail] Databases:', this.databases.map((d: any) => ({ id: d.fnConnectionID, name: d.fcConnectionName })));
           console.log('[ReportDetail] Departments:', this.departments);
           console.log('[ReportDetail] Users:', this.users);
           this.report.Exports = this.report.Exports || [];
@@ -679,7 +679,7 @@ export class ReportDetailComponent implements OnInit {
 
       // Set initial dropdown values if available
       if (base.DatabaseConnection && !base.fnConnectionID) {
-        base.fnConnectionID = base.DatabaseConnection.fnDatabaseConnectionID;
+        base.fnConnectionID = base.DatabaseConnection.fnConnectionID;
         console.log('[normalizeReportPayload] Set fnConnectionID from DatabaseConnection:', base.fnConnectionID);
       }
       if (base.Department && !base.fnDepartmentID) {

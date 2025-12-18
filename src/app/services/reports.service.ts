@@ -139,7 +139,7 @@ export class ReportsService {
           Departments: setup.Departments || [],
           Users: setup.Users || []
         } as any;
-        console.log('[ReportsService] getReport merged - Databases count:', merged.Databases.length, 'Databases:', merged.Databases.map((d: any) => ({ id: d.fnDatabaseConnectionID, name: d.fcConnectionName })));
+        console.log('[ReportsService] getReport merged - Databases count:', merged.Databases.length, 'Databases:', merged.Databases.map((d: any) => ({ id: d.fnConnectionID, name: d.fcConnectionName })));
         console.log('[ReportsService] getReport merged - fnConnectionID from report:', merged.fnConnectionID || report.fnConnectionID);
         return merged;
       }),
