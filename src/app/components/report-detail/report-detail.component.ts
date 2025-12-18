@@ -31,7 +31,7 @@ import { ReportsService } from '../../services/reports.service';
           <label>Database</label>
           <ng-container *ngIf="!readOnly">
             <select [(ngModel)]="report.fnConnectionID" (change)="onDatabaseChange()" [disabled]="readOnly">
-              <option value="">-- Select Database --</option>
+              <option [value]="null">-- Select Database --</option>
               <option *ngFor="let db of databases" [value]="db.fnDatabaseConnectionID">{{ db.fcConnectionName }}</option>
             </select>
           </ng-container>
@@ -305,6 +305,8 @@ export class ReportDetailComponent implements OnInit {
           const normalized = this.normalizeReportPayload(this.payload);
           this.report = normalized.report;
           console.log('[ReportDetail] Normalized report:', this.report);
+          console.log('[ReportDetail] fnConnectionID:', this.report.fnConnectionID, 'type:', typeof this.report.fnConnectionID);
+          console.log('[ReportDetail] DatabaseConnection:', this.report.DatabaseConnection);
           console.log('[ReportDetail] Report Logs:', this.report.Logs);
           console.log('[ReportDetail] Report Status:', this.report.Status);
           // Extract nested lists if they exist in the response
@@ -313,7 +315,7 @@ export class ReportDetailComponent implements OnInit {
           this.databases = (this.payload as any).Databases || [];
           this.users = (this.payload as any).Users || [];
           this.departments = (this.payload as any).Departments || [];
-          console.log('[ReportDetail] Databases:', this.databases);
+          console.log('[ReportDetail] Databases:', this.databases.map((d: any) => ({ id: d.fnDatabaseConnectionID, name: d.fcConnectionName })));
           console.log('[ReportDetail] Departments:', this.departments);
           console.log('[ReportDetail] Users:', this.users);
           this.report.Exports = this.report.Exports || [];
@@ -678,12 +680,15 @@ export class ReportDetailComponent implements OnInit {
       // Set initial dropdown values if available
       if (base.DatabaseConnection && !base.fnConnectionID) {
         base.fnConnectionID = base.DatabaseConnection.fnDatabaseConnectionID;
+        console.log('[normalizeReportPayload] Set fnConnectionID from DatabaseConnection:', base.fnConnectionID);
       }
       if (base.Department && !base.fnDepartmentID) {
         base.fnDepartmentID = base.Department.fnDepartmentID;
+        console.log('[normalizeReportPayload] Set fnDepartmentID from Department:', base.fnDepartmentID);
       }
       if (base.User && !base.fnUserID) {
         base.fnUserID = base.User.fnUserID;
+        console.log('[normalizeReportPayload] Set fnUserID from User:', base.fnUserID);
       }
 
       return { report: base, fileExtensions: payload.FileExtensions, delimiters: payload.Delimiters };

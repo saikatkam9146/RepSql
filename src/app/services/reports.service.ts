@@ -80,12 +80,14 @@ export class ReportsService {
     }).pipe(
       map(({ report, setup }) => {
         // Merge setup data into report response
-        return {
+        const merged = {
           ...report,
           Databases: setup.DatabaseConnection || [],
           Departments: setup.Departments || [],
           Users: setup.Users || []
         } as any;
+        console.log('[ReportsService] getReportSetup merged - Databases count:', merged.Databases.length, 'Departments count:', merged.Departments.length, 'Users count:', merged.Users.length);
+        return merged;
       }),
       catchError(err => {
         console.warn('getReportSetup forkJoin failed, returning minimal defaults', err);
@@ -131,12 +133,15 @@ export class ReportsService {
           return null;
         }
         // Merge setup data into report response
-        return {
+        const merged = {
           ...report,
           Databases: setup.DatabaseConnection || [],
           Departments: setup.Departments || [],
           Users: setup.Users || []
         } as any;
+        console.log('[ReportsService] getReport merged - Databases count:', merged.Databases.length, 'Databases:', merged.Databases.map((d: any) => ({ id: d.fnDatabaseConnectionID, name: d.fcConnectionName })));
+        console.log('[ReportsService] getReport merged - fnConnectionID from report:', merged.fnConnectionID || report.fnConnectionID);
+        return merged;
       }),
       catchError(err => {
         console.warn('getReport forkJoin failed, trying sample data fallback', err);
